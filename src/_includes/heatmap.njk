@@ -38,7 +38,7 @@
     <h2 class="visually-hidden" id="kf-title">Key figures</h2>
     <div class="stat-grid key-figures" id="key-figures" aria-labelledby="kf-title">
       {%- for s in report.stats %}
-      <div class="stat{% if s.highlight %} is-highlight{% endif %}"><div class="stat-v">{{ s.value | fill(meta.stats) }}</div><p class="stat-k">{{ s.label | fill(meta.stats) }}</p></div>
+      <div class="stat{% if s.highlight %} is-highlight{% endif %}"><div class="stat-v">{{ s.value | fill(meta.stats) }}{% if s.unit %}<span class="unit">{{ s.unit }}</span>{% endif %}</div><p class="stat-k">{{ s.label | fill(meta.stats) }}</p></div>
       {%- endfor %}
       {%- for rg in report.regions %}{% for s in rg.stats %}
       <div class="stat is-highlight" data-region="{{ rg.id }}" hidden><div class="stat-v">{{ s.value | fill(meta.regions[rg.id]) }}</div><p class="stat-k">{{ s.label | fill(meta.regions[rg.id]) }}</p></div>
@@ -47,7 +47,7 @@
 
     <nav class="pills" aria-label="On this page">
       <a href="#map">Map</a>
-      {%- if report.table %}<a href="#{{ report.table.id }}">{{ report.table.nav }}</a>{% endif %}
+      {%- for S in pg.sections %}{% if S.nav %}<a href="#{{ S.id }}">{{ S.nav }}</a>{% endif %}{% endfor %}
       <a href="#methods">Methods and Sources</a>
     </nav>
   </div>
@@ -98,22 +98,22 @@
     <div class="print-maps" id="printMaps"></div>
   </section>
 
-  {%- if report.table and pg.rows.length %}
-  {%- set T = report.table %}
-  <section class="section" id="{{ T.id }}" aria-labelledby="{{ T.id }}-title">
+  {%- for S in pg.sections %}
+  {%- if S.kind == "table" and S.rows.length %}
+  <section class="section" id="{{ S.id }}" aria-labelledby="{{ S.id }}-title">
     <div class="sec-head">
-      <h2 class="section-title" id="{{ T.id }}-title">{{ T.title }}<br><span class="muted">{{ T.titleSub }}</span></h2>
-      <p>{{ T.intro | fill(meta.stats | merge({ limit: pg.rows.length })) }}</p>
+      <h2 class="section-title" id="{{ S.id }}-title">{{ S.title }}<br><span class="muted">{{ S.titleSub }}</span></h2>
+      <p>{{ S.intro | fill(meta.stats | merge({ limit: S.rows.length })) }}</p>
     </div>
     <div class="table-box">
       <table class="dtable">
         <thead><tr>
-          {%- for c in T.columns %}<th scope="col"{% if c.align == "end" %} class="end"{% endif %}>{{ c.label }}</th>{% endfor -%}
+          {%- for c in S.columns %}<th scope="col"{% if c.align == "end" %} class="end"{% endif %}>{{ c.label }}</th>{% endfor -%}
         </tr></thead>
         <tbody>
-          {%- for row in pg.rows %}
+          {%- for row in S.rows %}
           <tr>
-            {%- for cell in row %}{% set c = T.columns[loop.index0] %}
+            {%- for cell in row %}{% set c = S.columns[loop.index0] %}
             <td class="{{ c.style or '' }}{% if c.align == 'end' %} end{% endif %}">{% if cell.swatch %}<span class="tiersq" style="background:{{ cell.swatch }}"></span>{% endif %}{{ cell.text }}</td>
             {%- endfor %}
           </tr>
@@ -122,7 +122,54 @@
       </table>
     </div>
   </section>
+  {%- elif S.kind == "bars" %}
+  <section class="section" id="{{ S.id }}" aria-labelledby="{{ S.id }}-title">
+    <div class="sec-head">
+      <h2 class="section-title" id="{{ S.id }}-title">{{ S.title }}<br><span class="muted">{{ S.titleSub }}</span></h2>
+      {%- if S.intro %}<p>{{ S.intro | fill(meta.stats) }}</p>{% endif %}
+    </div>
+    <div class="charts">
+      {%- for c in S.charts %}
+      <figure class="panel chart">
+        <figcaption>
+          <h3>{{ c.title }}</h3>
+          <ul class="chart-key">{% for se in c.series %}<li><span class="sw" style="background:var(--{{ se.color }})"></span>{{ se.label }}</li>{% endfor %}</ul>
+        </figcaption>
+        <div class="bars" style="--n:{{ c.groups | length }}">
+          {%- for g in c.groups %}
+          <div class="bar-group">
+            <div class="bar-stack">
+              {%- for b in g.bars %}<span class="bar" style="--h:{{ b.pct }}%;--c:var(--{{ b.color }})"><span class="bar-v">{{ b.value }}</span></span>{% endfor -%}
+            </div>
+            <span class="bar-k">{{ g.label }}</span>{% if g.sub %}<span class="bar-sub">{{ g.sub }}</span>{% endif %}
+          </div>
+          {%- endfor %}
+        </div>
+        {%- if c.foot %}<p class="chart-foot">{{ c.foot }}</p>{% endif %}
+      </figure>
+      {%- endfor %}
+    </div>
+  </section>
+  {%- elif S.kind == "facts" %}
+  <div class="facts"{% if S.id %} id="{{ S.id }}"{% endif %}>
+    {%- for f in S.items %}
+    <div class="fact"><p class="fact-eb">{{ f.eyebrow }}</p><p class="fact-v">{{ f.value }}</p><p>{{ f.text }}</p></div>
+    {%- endfor %}
+  </div>
+  {%- elif S.kind == "notes" %}
+  <section class="section" id="{{ S.id }}" aria-labelledby="{{ S.id }}-title">
+    <div class="sec-head">
+      <h2 class="section-title" id="{{ S.id }}-title">{{ S.title }}<br><span class="muted">{{ S.titleSub }}</span></h2>
+      {%- if S.intro %}<p>{{ S.intro | fill(meta.stats) }}</p>{% endif %}
+    </div>
+    <div class="notes">
+      {%- for n in S.items %}
+      <div class="note-card"><span class="note-rule" aria-hidden="true"></span><h3>{{ n.title }}</h3><p>{{ n.text }}</p></div>
+      {%- endfor %}
+    </div>
+  </section>
   {%- endif %}
+  {%- endfor %}
 
   <section class="section" id="methods" aria-labelledby="m-title">
     <div class="sec-head">

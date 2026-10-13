@@ -9,6 +9,8 @@ belong in this repo.
 | `/` | All reports, grouped by state |
 | `/ok` | Oklahoma reports |
 | `/ok/home-risk` | Oklahoma Home Risk Map (current edition) |
+| `/il` | Illinois reports |
+| `/il/hail-exposure` | Illinois Hail Exposure Report (current edition) |
 
 Report links can open on a layer, view, area or region, for example
 `/ok/home-risk?layer=fire&view=county&county=comanche` or `/ok/home-risk?region=southwest`.
@@ -26,10 +28,14 @@ npm run build    # writes _site/
 1. Add a config file in `src/_data/reports/<id>.json` (copy `ok-home-risk.json`): title, layers,
    views, legend text, detail fields, key figures, regions, methods. Optional display fields:
    `tiles` (short figures on the state page), `images` (which layer the home hero and report cards
-   show), `table` (a ranked table of areas), `sources` (source tags) and `highlight` on a stat,
-   layer or method to give it the brand glow.
+   show), `table` (a ranked table of areas), `sources` (source tags), `unit` on a stat (a blue
+   suffix such as `%`) and `highlight` on a stat, layer or method to give it the brand glow.
+   For more than one table, use `sections` instead of `table`: an ordered list shown after the map,
+   each with a `kind` of `table` (same fields as `table`), `bars` (bar charts from the values in the
+   config), `facts` (dated fact cards) or `notes` (titled notes). `il-hail-exposure.json` uses all four.
 2. Add the data in `src/data/<state>/<report>/<edition>/` (`attrs.json`, `meta.json`) and the
-   shapes in `src/data/<state>/geo-<vintage>.json`.
+   shapes in `src/data/<state>/geo-<vintage>.json` (`pipeline/geo.py` builds these from Census 2020
+   boundaries for any state; a state taller than it is wide is letterboxed on cards and in the map).
 3. Add the state to `src/_data/site.json` if it is new.
 
 No template, script or stylesheet changes are needed.
@@ -56,6 +62,7 @@ their colors are `MAP_COLORS` in `eleventy.config.js`.
 uv venv --python 3.12 && uv pip install -r pipeline/requirements.txt
 .venv/bin/python pipeline/usfs.py --state OK
 .venv/bin/python pipeline/home_risk.py --state OK --edition 2026-10
+.venv/bin/python pipeline/hail_exposure.py --state IL --edition 2026-10
 ```
 
 `npm run check` compares the site data with the original map it was extracted from (that file is

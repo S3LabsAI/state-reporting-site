@@ -10,6 +10,8 @@ const readJson = file => JSON.parse(fs.readFileSync(file, 'utf8'));
 const MAP_COLORS = {
   'sev-0': '#3b3038', 'sev-1': '#80404a', 'sev-2': '#cc5640', 'sev-3': '#ff8f66',
   'wf-0': '#3a3428', 'wf-1': '#7d5d1f', 'wf-2': '#c98a1c', 'wf-3': '#fbbf24',
+  'hail-0': '#1c2a3a', 'hail-1': '#1f5288', 'hail-2': '#2f86d9', 'hail-3': '#8fcbff',
+  t1: '#8fcbff', t2: '#2f86d9', t3: '#1f4670',
   prime: '#057be5', review: '#56637a', other: '#1e2834', nodata: '#12171d',
   edge: '#0d1117', state: '#64748b',
 };
@@ -45,6 +47,7 @@ function unitColor(L, u) {
 }
 
 // A static SVG of one layer in one view. Coordinates are rounded: these images are shown small.
+// Cards show the images at 1000:525, so a state taller than that is centered in a wider frame.
 function mapSvg(report, geo, attrs, layerId, viewId) {
   const L = resolveLayer(report.map, layerId, viewId);
   const round = d => d.replace(/-?\d+\.\d+/g, n => String(Math.round(+n)));
@@ -52,16 +55,15 @@ function mapSvg(report, geo, attrs, layerId, viewId) {
   const sw = viewId === 'zip' ? .35 : .9;
   const units = attrs[viewId].filter(u => geo[viewId][u.id])
     .map(u => `<path d="${round(geo[viewId][u.id])}" fill="${unitColor(L, u)}"/>`).join('');
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${geo.w} ${geo.h}" width="${geo.w}" height="${Math.round(geo.h)}">` +
+  const fw = geo.h > geo.w * .55 ? Math.round(geo.h * 1000 / 525) : geo.w, x = Math.round((geo.w - fw) / 2);
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${x} 0 ${fw} ${geo.h}" width="${fw}" height="${Math.round(geo.h)}">` +
     `<path d="${outline}" fill="${MAP_COLORS.nodata}"/>` +
     `<g stroke="${MAP_COLORS.edge}" stroke-width="${sw}" stroke-linejoin="round">${units}</g>` +
     `<path d="${outline}" fill="none" stroke="${MAP_COLORS.state}" stroke-width="1.2" stroke-linejoin="round"/></svg>`;
 }
 
-// Rows for a report's table: one cell per column, filled from the area's record.
-function tableRows(report, attrs) {
-  const T = report.table;
-  if (!T) return [];
+// Rows for a table section: one cell per column, filled from the area's record.
+function tableRows(report, T, attrs) {
   const M = report.map;
   return attrs[T.view].filter(u => matches(T.where, u))
     .sort((a, b) => (a[T.sort] ?? Infinity) - (b[T.sort] ?? Infinity))
@@ -73,6 +75,24 @@ function tableRows(report, attrs) {
       return t == null || t < 0 ? { text: 'No data' }
         : { text: `${u[L.score]} · ${M.tierLabels[t]}`, swatch: `var(--${L.ramp}-${t})` };
     }));
+}
+
+// The sections shown after the map, in order: tables, bar charts, fact cards and notes. A report
+// with only `table` gets that one table. Tables get their rows; bar charts get bar heights.
+function sections(report, attrs) {
+  const list = report.sections || (report.table ? [{ kind: 'table', ...report.table }] : []);
+  return list.map(s => {
+    if (s.kind === 'table') return { ...s, rows: tableRows(report, s, attrs) };
+    if (s.kind === 'bars') {
+      return { ...s, charts: s.charts.map(c => {
+        const max = Math.max(...c.groups.flatMap(g => g.values));
+        return { ...c, groups: c.groups.map(g => ({ ...g, bars: g.values.map((v, i) => ({
+          value: v.toLocaleString('en-US'), pct: +(v / max * 100).toFixed(1),
+          color: c.series[g.series ?? i].color })) })) };
+      }) };
+    }
+    return s;
+  });
 }
 
 // One page per report at /<state>/<slug>/, showing its current edition only.
@@ -88,7 +108,7 @@ function reportPages() {
     // Static map images, one per layer, in the first view.
     const view = report.map.views[0].id;
     const images = Object.fromEntries(report.map.layers.map(l => [l.id, `${url}map-${l.id}.svg`]));
-    return { report, edition: report.edition, meta, url, images, view, rows: tableRows(report, attrs) };
+    return { report, edition: report.edition, meta, url, images, view, sections: sections(report, attrs) };
   });
   return cache;
 }

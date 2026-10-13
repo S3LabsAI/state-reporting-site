@@ -67,6 +67,13 @@
   /* Map: risk tiers, low to extreme (lighter = higher risk on the dark ground) */
   --sev-0: #3b3038; --sev-1: #80404a; --sev-2: #cc5640; --sev-3: #ff8f66;
   --wf-0: #3a3428; --wf-1: #7d5d1f; --wf-2: #c98a1c; --wf-3: #fbbf24;
+  /* Map: hail index, below average to 4x (lighter = more hail) */
+  --hail-0: #1c2a3a; --hail-1: #1f5288; --hail-2: #2f86d9; --hail-3: #8fcbff;
+  /* Map: targeting tiers, Tier 1 brightest */
+  --t1: #8fcbff; --t2: #2f86d9; --t3: #1f4670;
+
+  /* Charts: main series, comparison series, muted series */
+  --bar-a: var(--brand); --bar-b: #9fd0ff; --bar-c: #1f4670;
 
   /* Map: status and structure */
   --prime: var(--brand);
