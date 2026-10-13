@@ -158,7 +158,8 @@ function drawPlaces(g, fixedScale) {
 // City labels stay the same size on screen at any zoom level.
 function sizePlaces() {
   if (!els.places) return;
-  const s = (svg.clientWidth || W) / W * k;
+  // A tall state is letterboxed by the frame's height limit, so the smaller ratio is the true scale.
+  const s = Math.min((svg.clientWidth || W) / W, (svg.clientHeight || H) / H) * k;
   for (const g of els.places.children) g.setAttribute('transform', `translate(${g.dataset.x} ${g.dataset.y}) scale(${1 / s})`);
 }
 

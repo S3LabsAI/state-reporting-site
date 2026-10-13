@@ -33,7 +33,7 @@ permalink: /
     <p class="stat-src">From the {{ fp.report.title }}, {{ fp.edition.label }} edition</p>
     <div class="stat-grid">
       {%- for s in fp.report.stats %}
-      <div class="stat{% if s.highlight %} is-highlight{% endif %}"><div class="stat-v">{{ s.value | fill(fp.meta.stats) }}</div><p class="stat-k">{{ s.label | fill(fp.meta.stats) }}</p></div>
+      <div class="stat{% if s.highlight %} is-highlight{% endif %}"><div class="stat-v">{{ s.value | fill(fp.meta.stats) }}{% if s.unit %}<span class="unit">{{ s.unit }}</span>{% endif %}</div><p class="stat-k">{{ s.label | fill(fp.meta.stats) }}</p></div>
       {%- endfor %}
     </div>
   </div>
@@ -70,12 +70,12 @@ permalink: /
       <div class="feature">
         <span class="icon-tile">{{ icon("database", 20, 1.75) }}</span>
         <h3>Public Sources Only</h3>
-        <p>FEMA, the USDA Forest Service, the U.S. Census Bureau and NOAA. No client names or account data, ever.</p>
+        <p>NOAA, FEMA, the USDA Forest Service and the U.S. Census Bureau. No client names or account data, ever.</p>
       </div>
       <div class="feature">
         <span class="icon-tile">{{ icon("chart", 20, 1.75) }}</span>
         <h3>Ranked Within the State</h3>
-        <p>Scores run 0 to 100 inside each state: Low 0-39, Moderate 40-69, High 70-89, Extreme 90-100.</p>
+        <p>Every score and tier compares places inside one state, so the ranking matches the ZIP codes your agency can target. Each report states its scale.</p>
       </div>
       <div class="feature">
         <span class="icon-tile">{{ icon("calendar-check", 20, 1.75) }}</span>

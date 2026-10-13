@@ -1,0 +1,252 @@
+{
+  "id": "il-hail-exposure",
+  "template": "heatmap",
+  "state": "il",
+  "slug": "hail-exposure",
+  "title": "Illinois Hail Exposure Report",
+  "shortTitle": "Hail Exposure Report",
+  "eyebrow": "Illinois Homeowners Market",
+  "summary": "Where roof-damaging hail and owner-occupied homes overlap, 2021 to 2026. All 102 counties scored, and the 484 ZIP codes in the top 15 counties ranked into three targeting tiers.",
+  "card": "Hail exposure by county and ZIP code, with 72 Tier 1 target ZIPs led by the southwest Chicago suburbs.",
+  "sourcesShort": "NOAA Storm Events, NOAA SPC, NOAA MRMS radar and the U.S. Census Bureau",
+  "sources": ["NOAA Storm Events", "NOAA Storm Prediction Center", "NOAA MRMS radar", "U.S. Census Bureau", "GeoNames"],
+  "tags": {
+    "line": "home",
+    "perils": ["severe-storm"],
+    "context": ["market"],
+    "format": "risk-map",
+    "geography": ["zip", "county"]
+  },
+  "geo": "/data/il/geo-2020.json",
+  "edition": { "id": "2026-10", "label": "October 2026", "data": "/data/il/hail-exposure/2026-10/" },
+  "map": {
+    "ariaLabel": "Map of Illinois colored by hail exposure",
+    "weight": "ownerHomes",
+    "weightLabel": "Illinois owner-occupied single-family homes",
+    "places": ["Chicago", "Rockford", "Peoria", "Springfield", "Champaign", "Kankakee", "Quincy", "Carbondale", "Belleville"],
+    "tierLabels": ["Below average", "Above average", "High", "Very high"],
+    "tierRanges": ["under 1.0", "1.0-1.9", "2.0-3.9", "4.0+"],
+    "views": [
+      { "id": "zip", "label": "ZIP Codes", "unit": "ZIPs", "titleSuffix": "by ZIP Code" },
+      { "id": "county", "label": "Counties", "unit": "counties", "titleSuffix": "by County", "lines": true }
+    ],
+    "layers": [
+      {
+        "id": "tier",
+        "label": "Targeting Tier",
+        "legendTitle": "Targeting Tier",
+        "highlight": true,
+        "blurb": "Tier 1 is the top 15% of ranked ZIP codes by score with a hail index of at least 2.0. Tier 2 is the top 40% with at least 1.0.",
+        "byView": {
+          "zip": {
+            "type": "category",
+            "fullTitle": "Targeting Tier by ZIP Code",
+            "note": "The 484 ZIP codes in the top 15 counties, ranked on one list by score. Gray areas are outside the top 15 counties.",
+            "categories": [
+              { "label": "Tier 1", "color": "t1", "when": { "field": "tier", "eq": 1 } },
+              { "label": "Tier 2", "color": "t2", "when": { "field": "tier", "eq": 2 } },
+              { "label": "Tier 3", "color": "t3" }
+            ],
+            "legendFoot": "Share of homes = share of owner-occupied single-family homes in the 484 ranked ZIP codes."
+          },
+          "county": {
+            "type": "category",
+            "fullTitle": "Top 15 Counties by Score",
+            "note": "Score multiplies the hail index by owner-occupied single-family homes, so large metro counties lead.",
+            "categories": [
+              { "label": "Top 15 county", "color": "t1", "when": { "field": "top15", "eq": 1 } },
+              { "label": "Other counties", "color": "other" }
+            ],
+            "legendFoot": "Share of homes = share of Illinois owner-occupied single-family homes. Switch to ZIP codes to see the tiers."
+          }
+        }
+      },
+      {
+        "id": "hail",
+        "label": "Hail Index",
+        "type": "tier",
+        "score": "hailIndex",
+        "tier": "hailTier",
+        "ramp": "hail",
+        "blurb": "Hail intensity alone, from radar hail swaths and ground reports, 2021 to 2026. 1.0 is the Illinois average.",
+        "title": "Hail Index",
+        "legendTitle": "Hail Index (Illinois average = 1.0)",
+        "note": "Radar and ground reports weighted 50/50, recent years counted double. 3.0 means three times the average Illinois location.",
+        "legendFoot": "Share of homes = share of owner-occupied single-family homes in the areas shown. Detail rows: report and radar days count days with 1 inch+ / 1.75 inch+ hail. ZIP codes outside the top 15 counties are not scored."
+      }
+    ],
+    "overlays": [],
+    "search": {
+      "label": "Find a ZIP or Town",
+      "placeholder": "60440 or Naperville"
+    }
+  },
+  "detail": {
+    "zip": {
+      "title": "{name} {id}",
+      "sub": "{county} County · Rank {rank} of 484",
+      "rows": [
+        { "label": "Targeting tier", "text": "Tier {tier}" },
+        { "label": "Hail index", "layer": "hail" },
+        { "label": "Score (top ZIP = 100)", "text": "{score}" },
+        { "label": "Owner-occupied homes", "text": "{ownerHomes:int}" },
+        { "label": "Median year built", "text": "{yearBuilt}" },
+        { "label": "Report days, 1 / 1.75 in", "text": "{reportDays}" },
+        { "label": "Radar days, 1 / 1.75 in", "text": "{radarDays}" },
+        { "label": "Last significant storm", "text": "{lastStorm}" }
+      ],
+      "chips": [
+        { "when": { "field": "tier", "eq": 1 }, "text": "Tier 1 target", "style": "prime" }
+      ]
+    },
+    "county": {
+      "title": "{name} County",
+      "sub": "Rank {rank} of 102 by score",
+      "rows": [
+        { "label": "Hail index", "layer": "hail" },
+        { "label": "Hail index rank", "text": "{hailRank} of 102" },
+        { "label": "Score (top county = 100)", "text": "{score}" },
+        { "label": "Owner-occupied homes", "text": "{ownerHomes:int}" },
+        { "label": "Reports, 1 / 1.75 in", "text": "{reports}" },
+        { "label": "Largest stone", "text": "{maxHail}" },
+        { "label": "Radar days, 1 / 1.75 in", "text": "{radarDays}" },
+        { "label": "Last 1.75 in+ storm", "text": "{lastStorm}" }
+      ],
+      "chips": [
+        { "when": { "field": "top15", "eq": 1 }, "text": "Top 15 county", "style": "prime" }
+      ]
+    }
+  },
+  "stats": [
+    { "value": "{tier1Zips}", "highlight": true, "label": "Tier 1 ZIP codes, holding {tier1Homes:int} owner-occupied single-family homes" },
+    { "value": "{topIndex}", "unit": "x", "label": "{topIndexCounty} County hail index against the Illinois average, the highest of {counties} counties" },
+    { "value": "1,757", "label": "Ground reports of 1-inch-plus hail since January 2021, 453 of them 1.75 inches or larger" },
+    { "value": "67", "unit": "%", "label": "Of 1-inch-plus hail reports fall in March, April and May" }
+  ],
+  "tiles": [
+    { "value": "{tier1Zips}", "label": "Tier 1 ZIPs" },
+    { "value": "{tier2Zips}", "label": "Tier 2 ZIPs" },
+    { "value": "{rankedZips}", "label": "ZIPs Ranked" }
+  ],
+  "images": { "hero": "tier", "card": "hail" },
+  "sections": [
+    {
+      "kind": "bars",
+      "id": "hail-by-year",
+      "nav": "Hail by Year and Month",
+      "title": "Hail by Year and Month",
+      "titleSub": "Spring Hail, Summer Swaths.",
+      "intro": "2023 logged the most ground reports. 2026 already has the largest radar swath of any year, with July to October still on preliminary reports.",
+      "charts": [
+        {
+          "title": "Ground Reports by Year",
+          "series": [
+            { "label": "1.00 in+", "color": "bar-a" },
+            { "label": "1.75 in+", "color": "bar-b" }
+          ],
+          "groups": [
+            { "label": "2021", "sub": "2,732 km²", "values": [84, 21] },
+            { "label": "2022", "sub": "3,272 km²", "values": [145, 20] },
+            { "label": "2023", "sub": "4,306 km²", "values": [515, 146] },
+            { "label": "2024", "sub": "3,097 km²", "values": [303, 69] },
+            { "label": "2025", "sub": "1,680 km²", "values": [301, 87] },
+            { "label": "2026", "sub": "5,186 km²", "values": [409, 110] }
+          ],
+          "foot": "Under each year: Illinois land under a radar hail swath of MESH 38 mm or more. 2026 runs January 1 to October 6."
+        },
+        {
+          "title": "Ground Reports by Month",
+          "series": [
+            { "label": "1.00 in+ reports, March to May", "color": "bar-a" },
+            { "label": "Other months", "color": "bar-c" }
+          ],
+          "groups": [
+            { "label": "Jan", "sub": "0.2%", "values": [4], "series": 1 },
+            { "label": "Feb", "sub": "1.4%", "values": [87], "series": 1 },
+            { "label": "Mar", "sub": "11.7%", "values": [409] },
+            { "label": "Apr", "sub": "9.4%", "values": [414] },
+            { "label": "May", "sub": "16.2%", "values": [348] },
+            { "label": "Jun", "sub": "25.2%", "values": [169], "series": 1 },
+            { "label": "Jul", "sub": "19.6%", "values": [143], "series": 1 },
+            { "label": "Aug", "sub": "9.0%", "values": [115], "series": 1 },
+            { "label": "Sep", "sub": "7.2%", "values": [51], "series": 1 },
+            { "label": "Oct", "sub": "0%", "values": [5], "series": 1 },
+            { "label": "Nov", "sub": "0%", "values": [10], "series": 1 },
+            { "label": "Dec", "sub": "0%", "values": [2], "series": 1 }
+          ],
+          "foot": "Under each month: its share of radar swath area. March to May holds the damaging ground hail; June and July hold 45% of the swath."
+        }
+      ]
+    },
+    {
+      "kind": "facts",
+      "items": [
+        { "eyebrow": "March 10, 2026", "value": "6.6 in", "text": "Illinois state-record stone near Kankakee. 4-inch stones fell in Darien, Downers Grove and Westmont." },
+        { "eyebrow": "July 27, 2026", "value": "1,345 km²", "text": "Largest radar swath of the six years, mostly over Cook, Will and DuPage. It covered 32% of DuPage." },
+        { "eyebrow": "April 4, 2023", "value": "124 reports", "text": "The busiest hail day in the record, across 22 counties, with a 4-inch stone near Bernadotte in Fulton County." }
+      ]
+    },
+    {
+      "kind": "table",
+      "id": "top-zips",
+      "nav": "Top ZIP Codes",
+      "title": "Top 25 ZIP Codes",
+      "titleSub": "The Southwest Suburbs Lead.",
+      "intro": "The top {limit} of {rankedZips} ranked ZIP codes. Tier 1 is one contiguous block from Naperville and Bolingbrook east to Orland Park, Tinley Park and New Lenox. Search the map for the rest.",
+      "view": "zip",
+      "where": { "field": "rank", "lt": 26 },
+      "sort": "rank",
+      "limit": 25,
+      "columns": [
+        { "label": "Rank", "text": "#{rank}", "style": "rank" },
+        { "label": "ZIP", "text": "{id}", "style": "strong" },
+        { "label": "Town", "text": "{name}" },
+        { "label": "County", "text": "{county}", "style": "soft" },
+        { "label": "Hail Index", "layer": "hail" },
+        { "label": "Owner-Occupied Homes", "text": "{ownerHomes:int}", "align": "end" },
+        { "label": "Score", "text": "{score}", "style": "strong", "align": "end" },
+        { "label": "Last Significant Storm", "text": "{lastStorm}", "style": "soft" }
+      ]
+    },
+    {
+      "kind": "table",
+      "id": "top-counties",
+      "nav": "Top Counties",
+      "title": "Top 15 Counties",
+      "titleSub": "Volume Meets Hail.",
+      "intro": "The top 15 counties hold 74% of the state's {stateHomes:int} owner-occupied single-family homes. Read the hail index and the score together: Peoria and Tazewell rank on homes, not hail.",
+      "view": "county",
+      "where": { "field": "top15", "eq": 1 },
+      "sort": "rank",
+      "limit": 15,
+      "columns": [
+        { "label": "Rank", "text": "#{rank}", "style": "rank" },
+        { "label": "County", "text": "{name}", "style": "strong" },
+        { "label": "Hail Index", "layer": "hail" },
+        { "label": "Index Rank", "text": "{hailRank}", "align": "end" },
+        { "label": "Owner-Occupied Homes", "text": "{ownerHomes:int}", "align": "end" },
+        { "label": "Reports 1 in / 1.75 in+", "text": "{reports}", "align": "end" },
+        { "label": "Score", "text": "{score}", "style": "strong", "align": "end" }
+      ]
+    },
+    {
+      "kind": "notes",
+      "id": "before-targeting",
+      "nav": "Read Before Targeting",
+      "title": "Read Before Targeting",
+      "titleSub": "Three Flags.",
+      "items": [
+        { "title": "The County Cut Is Volume-Weighted", "text": "Peoria (14th) and Tazewell (15th) make the top 15 on housing count, with hail indexes of 0.83 and 0.92. McLean misses at 16th, yet insurer claims clustered in Bloomington in April 2026 and Chenoa in May 2025. Bloomington 61701 ranks 70th of all Illinois ZIP codes and Belvidere 61008 ranks 56th: both are worth adding if the campaign has room." },
+        { "title": "July to October 2026 Is Preliminary", "text": "NOAA Storm Events data ends in June 2026. The last three months rest on 42 preliminary Storm Prediction Center reports, and for January 2021 to June 2026 the final Storm Events count was 1.58 times the preliminary one, so recent ground counts will rise. Radar covers those months fully." },
+        { "title": "No Public ZIP-Level Claims", "text": "The latest NICB Illinois hail claim figures cover 2017 to 2019, and the Illinois Department of Insurance publishes no county or ZIP hail data. Insurer storm releases confirm the ranking where they overlap but cannot replace claims counts." }
+      ]
+    }
+  ],
+  "methods": [
+    { "title": "Hail Index", "highlight": true, "text": "Two measures, each divided by its Illinois average and averaged 50/50. Radar: days with NOAA MRMS maximum estimated hail size (MESH) of 29 mm or more over each area, plus double weight at 38 mm or more. Ground reports: days with a 1-inch-plus report within 5 km, triple weight at 1.75 inches or more. 2021-2022 storms count half, 2023-2024 once and 2025-2026 twice, because roofs are usually replaced within a year or two of a storm." },
+    { "title": "Score and Tiers", "text": "Score = hail index × owner-occupied single-family homes, times a roof age factor of 1 minus half the share built in 2010 or later. The top 15 counties by score are kept, and every ZIP code whose largest land share sits in one of them is ranked on one list. Tier 1: top 15% by score (rank 73 or better) with a hail index of at least 2.0. Tier 2: top 40% (rank 194 or better) with at least 1.0. Tier 3: the rest." },
+    { "title": "Stability", "text": "Re-running the ranking with every year weighted equally, 1.75-inch hail weighted 2 times and the index 70% radar keeps the same top three ZIP codes and 60 of the 72 Tier 1 ZIPs. Treat Tier 1 as a safe core and ranks inside Tier 2 as a band." },
+    { "title": "Homes", "text": "Owner-occupied single-family homes, detached and attached, from the U.S. Census Bureau American Community Survey 2020-2024 5-year estimates (tables B25032, B25036, B25037). ZIP codes are 2020 Census ZIP Code Tabulation Areas; PO-box ZIPs are not ranked. Renter-occupied, multi-unit and mobile homes are excluded." },
+    { "title": "Hail Data", "text": "NOAA Storm Events Database, January 2021 to June 2026, and Storm Prediction Center preliminary reports, July 1 to October 6, 2026: 1,757 reports of 1 inch or more. NOAA MRMS MESH daily maximums, January 2, 2021 to October 7, 2026, 2,105 days with none missing. Damage checks used insurer releases, local news and City of Chicago re-roof permits." }
+  ]
+}

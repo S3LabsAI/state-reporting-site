@@ -90,6 +90,9 @@ def download(url, dest, keep=None, note=""):
         if keep is None:
             while chunk := r.read(1 << 20):
                 out.write(chunk)
+            size, want = out.tell(), r.headers.get("Content-Length")
+            if want and size != int(want):
+                raise OSError(f"{url}: got {size} of {want} bytes; run again to retry")
         else:
             for i, line in enumerate(io.TextIOWrapper(r, encoding="utf-8-sig", newline="")):
                 if i == 0 or keep(line):
@@ -171,6 +174,10 @@ def gazetteer_counties(year):
 
 def cb_zcta():
     return download(f"{CENSUS}/geo/tiger/GENZ2020/shp/cb_2020_us_zcta520_500k.zip", "census/cb_2020_us_zcta520_500k.zip")
+
+
+def cb_state(year):
+    return download(f"{CENSUS}/geo/tiger/GENZ{year}/shp/cb_{year}_us_state_500k.zip", f"census/cb_{year}_us_state_500k.zip")
 
 
 def cb_county(year):
