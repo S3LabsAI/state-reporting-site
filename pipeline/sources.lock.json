@@ -23,6 +23,18 @@
   "sha256": "3c337402b5c6e8d5aa26b4278ccf4edc8989f2683765b3ffbf22296cdb2df3a0",
   "fetched": "2026-10-08"
  },
+ "census/cb_2020_us_county_500k.zip": {
+  "url": "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_us_county_500k.zip",
+  "bytes": 12587934,
+  "sha256": "1a45c87a5a0c322514c9d5c9ebcba5eb9df313bd38962f6db56107ba0ccacc6f",
+  "fetched": "2026-10-13"
+ },
+ "census/cb_2020_us_state_500k.zip": {
+  "url": "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_us_state_500k.zip",
+  "bytes": 3548589,
+  "sha256": "dcc877984a3e4d59c1ee8d068b6681517c545e0c1827b7e78a7c2c7cbb167da6",
+  "fetched": "2026-10-13"
+ },
  "census/cb_2020_us_zcta520_500k.zip": {
   "url": "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_us_zcta520_500k.zip",
   "bytes": 66655314,

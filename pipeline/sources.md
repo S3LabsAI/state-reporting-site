@@ -31,6 +31,37 @@ Edition settings (data releases and storm periods) live in `EDITIONS` at the top
 | NOAA NCEI Storm Events details | 1990-2025 | Hail reports 1 inch and larger | ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles |
 | GeoNames U.S. postal codes | current | Town name for each ZIP code | download.geonames.org/export/zip |
 
+## Hail exposure report
+
+`pipeline/hail_exposure.py` turns a finished hail exposure study into site data. The study's ranking
+tables are committed as CSV in `pipeline/inputs/<st>-hail-exposure/<edition>/`; the Illinois October 2026
+tables are Tables 3.1 (all 102 counties) and 4.1 (the 484 ZCTAs in the top 15 counties) of "Illinois hail
+exposure, 2021 to 2026" (October 7, 2026), checked against the study's totals (72 / 118 / 294 ZIPs by
+tier, 661,081 Tier 1 homes, 2,897,474 homes statewide). Map shapes come from `pipeline/geo.py`.
+
+```bash
+.venv/bin/python pipeline/geo.py --state IL --zips pipeline/inputs/il-hail-exposure/2026-10/zip_ranking.csv \
+  --places "Chicago:-87.63,41.88" "Rockford:-89.09,42.27" "Peoria:-89.59,40.69" "Springfield:-89.65,39.80" \
+  "Champaign:-88.24,40.12" "Bloomington:-88.99,40.48" "Kankakee:-87.86,41.12" "Decatur:-88.95,39.84" \
+  "Quincy:-91.41,39.94" "Carbondale:-89.22,37.73" "Belleville:-89.98,38.52"
+.venv/bin/python pipeline/hail_exposure.py --state IL --edition 2026-10 --publish
+```
+
+| Dataset | Release | Used for (in the study) |
+|---|---|---|
+| NOAA NCEI Storm Events details | 2021 to June 2026 (c20260918) | Hail reports 1 inch and larger |
+| NOAA SPC filtered daily hail reports | July 1 to October 6, 2026 | Preliminary reports after Storm Events ends |
+| NOAA MRMS MESH_Max_1440min | January 2, 2021 to October 7, 2026 | Radar hail swaths at 29 mm and 38 mm, per ZCTA and county |
+| ACS 5-year table-based summary files | 2020-2024 | B25032 owner-occupied single-family homes, B25036 year built, B25037 median year built |
+| Cartographic boundaries (500k) | 2020 state, county, ZCTA | Map shapes (`geo.py`) and county FIPS codes |
+| GeoNames U.S. postal codes | current | Town name for each ZIP code |
+
+Hail index: radar days with MESH 29 mm+ plus double weight at 38 mm+, and ground report days with a 1-inch+
+report within 5 km (3 times at 1.75 inches+), each divided by its Illinois average and averaged 50/50; years
+weighted 0.5 (2021-22), 1.0 (2023-24) and 2.0 (2025-26). Score: hail index × owner-occupied single-family
+homes × (1 - 0.5 × share built 2010 or later). Tier 1: top 15% by score with index 2.0+; Tier 2: top 40%
+with index 1.0+.
+
 ## Method details recovered from the October 2026 edition
 
 These rules reproduce the published Oklahoma data and are written into `home_risk.py`:

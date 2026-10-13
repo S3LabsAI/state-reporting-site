@@ -32,6 +32,8 @@
 .mapbox .note { font-size: 14px; line-height: 20px; color: var(--ink-muted); margin: 6px 0 20px }
 .mapframe { position: relative; overflow: hidden; border-radius: var(--radius-md); background: var(--ground); border: 1px solid var(--border-subtle); padding: 12px }
 svg.map { display: block; width: 100%; height: auto; touch-action: pan-y; user-select: none; -webkit-user-select: none }
+/* A tall state (Illinois) stays within the window; the map centers in the frame */
+svg.map { max-height: min(78vh, 880px) }
 svg.map.zoomed { touch-action: none; cursor: grab }
 svg.map path { vector-effect: non-scaling-stroke }
 .ground { fill: var(--map-ground) }
@@ -99,6 +101,33 @@ dl.kv dd { text-align: right; font-variant-numeric: tabular-nums; font-weight: 6
 .dtable .strong { font-weight: 600 }
 .dtable .soft { color: var(--ink-soft) }
 
+/* Bar charts (sections of kind "bars") */
+.charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(480px, 100%), 1fr)); gap: 24px }
+.chart { margin: 0; display: flex; flex-direction: column; gap: 20px }
+.chart h3 { font: 700 18px/26px var(--font-display) }
+.chart-key { list-style: none; display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 8px; font-size: 12px; line-height: 16px; color: var(--ink-muted) }
+.chart-key li { display: inline-flex; align-items: center; gap: 6px }
+.bars { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 8px; align-items: end }
+.bar-group { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0 }
+.bar-stack { display: flex; justify-content: center; align-items: flex-end; gap: 3px; width: 100%; height: 220px; padding-top: 20px; border-bottom: 1px solid var(--border-mid); margin-bottom: 6px }
+.bar { position: relative; flex: 0 1 26px; min-width: 6px; height: var(--h); min-height: 2px; border-radius: 3px 3px 0 0; background: var(--c) }
+.bar-v { position: absolute; left: 50%; bottom: 100%; transform: translateX(-50%); padding-bottom: 3px; font-size: 11px; line-height: 14px; color: var(--ink-soft); font-variant-numeric: tabular-nums; white-space: nowrap }
+.bar-k { font: 600 13px/18px var(--font-display) }
+.bar-sub { font-size: 11px; line-height: 14px; color: var(--ink-muted); text-align: center; font-variant-numeric: tabular-nums }
+.chart-foot { font-size: 12px; line-height: 16px; color: var(--ink-muted); margin-top: auto }
+
+/* Fact cards and notes */
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 24px; padding-top: 24px }
+.fact { padding: 24px; border-radius: var(--radius-md); background: var(--surface); border: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 8px }
+.fact-eb { font-size: 12px; line-height: 16px; font-weight: 600; color: var(--brand-text) }
+.fact-v { font: 800 32px/1.1 var(--font-display); letter-spacing: -.5px; font-variant-numeric: tabular-nums }
+.fact p:last-child { font-size: 14px; line-height: 20px; color: var(--ink-soft) }
+.notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap: 24px }
+.note-card { padding: 32px; border-radius: var(--radius-md); background: var(--surface); border: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 12px }
+.note-rule { width: 40px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, var(--brand), var(--accent-amber)) }
+.note-card h3 { font: 700 20px/28px var(--font-display) }
+.note-card p { color: var(--ink-muted) }
+
 /* Methods */
 .methods { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr)); gap: 24px }
 .method { padding: 24px; border-radius: var(--radius-md); background: var(--surface); border: 1px solid var(--border-subtle) }
@@ -118,6 +147,11 @@ dl.kv dd { text-align: right; font-variant-numeric: tabular-nums; font-weight: 6
   .mapside { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start }
 }
 @media (max-width: 700px) {
+  .bars { gap: 3px }
+  .bar-v { font-size: 9.5px }
+  .bar-k { font-size: 11px }
+  .bar-sub { font-size: 9.5px }
+  .note-card { padding: 24px }
   .mapside { grid-template-columns: minmax(0, 1fr) }
   .controls { gap: 14px 16px; padding: 14px }
   .check { max-width: none }
