@@ -62,6 +62,38 @@ weighted 0.5 (2021-22), 1.0 (2023-24) and 2.0 (2025-26). Score: hail index × ow
 homes × (1 - 0.5 × share built 2010 or later). Tier 1: top 15% by score with index 2.0+; Tier 2: top 40%
 with index 1.0+.
 
+## Income targeting report
+
+`pipeline/income_targeting.py --state <ST>` builds the report for any state. The report figures come from
+`build()`, which takes raw ZIP and county rows and has no downloads, so it can be checked on any input.
+
+| Dataset | Release | Used for | Source |
+|---|---|---|---|
+| ACS 5-year table-based summary files | 2020-2024 | B19013 median household income and margin of error, B11001 households, B25003 tenure, B25077 median home value (ZCTA, county, state, U.S.) | www2.census.gov/programs-surveys/acs/summary_file |
+| 2020 ZCTA relationship file | 2020 | Which ZCTAs belong to the state (more than half their land in it) and each ZCTA's county (largest land share) | www2.census.gov/geo/docs/maps-data/data/rel2020/zcta520 |
+| Gazetteer counties | 2024 | County names | www2.census.gov/geo/docs/maps-data/data/gazetteer |
+| OMB metro delineation (list 1) | July 2023 | County to metropolitan area | www2.census.gov/programs-surveys/metro-micro/geographies/reference-files |
+| GeoNames U.S. postal codes | current | Town name for each ZIP code | download.geonames.org/export/zip |
+
+Method: ZIP codes with a published median are cut at the 25th, 50th and 75th percentiles (linear
+interpolation, each ZIP counted once); the top quartile is the target list. Core targets have 500 or more
+households and a margin of error under 25% of the estimate; top-coded medians have no margin and pass on
+households alone. Counties get their own quartiles across the state's counties. Metros are named for their
+first principal city unless `METRO_LABELS` gives a name.
+
+### Texas, October 2026
+
+The Texas data is built by `income_targeting.py` from the downloads above, on GitHub Actions (the
+**Income targeting data** workflow). It reproduces the original October 1, 2026 Texas income study on
+every figure: the same 1,989 ZIP codes, quartile breaks $56,550 / $69,977 / $88,084, 437 target ZIPs holding
+37.2% of households, 335 core ZIPs holding 4,044,267 households, and the same quartile and target status
+for every ZIP. Two values differ by design: the owner-occupied rate on 62 ZIP codes (owner-occupied homes
+over occupied homes here; the study rounded differently), and the county top-quartile line, $72,417 here
+(ACS county medians) against the study's $72,436, with the same 64 counties above it.
+
+The map shapes (`src/data/tx/geo-2020.json`) and the first draft of the data were lifted from the study with
+`pipeline/extract_income_study.py` (Phase 1); `pipeline/geo.py --state TX` can rebuild the shapes.
+
 ## Method details recovered from the October 2026 edition
 
 These rules reproduce the published Oklahoma data and are written into `home_risk.py`:

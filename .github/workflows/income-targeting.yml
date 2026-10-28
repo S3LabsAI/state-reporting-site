@@ -1,0 +1,122 @@
+# Builds income targeting report data for one state from Census downloads, on GitHub's runners.
+#
+# Run it from the Actions tab (Run workflow) with a state, or, on a pull request, add the label
+# "income-pipeline TX" (check only) or "income-pipeline TX publish" (check, then commit the data).
+# A check builds into pipeline/out, compares it with the published edition and shows both in the run
+# summary. Publish replaces src/data/<st>/income-targeting/<edition>/ with the build and commits it,
+# with the updated pipeline/sources.lock.json, to the branch the run is on.
+name: Income targeting data
+
+on:
+  workflow_dispatch:
+    inputs:
+      state:
+        description: State postal code, for example TX
+        required: true
+      edition:
+        description: Edition id (an entry in EDITIONS in pipeline/income_targeting.py)
+        required: true
+        default: "2026-10"
+      places:
+        description: 'Map labels for a new state, as "Name:lon,lat" separated by spaces (builds geo-2020.json)'
+        required: false
+        default: ""
+      publish:
+        description: Commit the data to this branch
+        type: boolean
+        default: false
+  pull_request:
+    types: [labeled]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: income-targeting-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.label.name, 'income-pipeline ')
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Read the request
+        id: req
+        env:
+          EVENT: ${{ github.event_name }}
+          LABEL: ${{ github.event.label.name }}
+          IN_STATE: ${{ inputs.state }}
+          IN_EDITION: ${{ inputs.edition }}
+          IN_PUBLISH: ${{ inputs.publish }}
+        run: |
+          if [ "$EVENT" = "pull_request" ]; then
+            read -r _ state mode <<< "$LABEL"
+            edition="2026-10"
+            publish=$([ "$mode" = "publish" ] && echo true || echo false)
+          else
+            state="$IN_STATE"; edition="$IN_EDITION"; publish="$IN_PUBLISH"
+          fi
+          state=$(echo "$state" | tr '[:lower:]' '[:upper:]')
+          echo "$state" | grep -Eq '^[A-Z]{2}$' || { echo "Not a state code: $state"; exit 1; }
+          echo "$edition" | grep -Eq '^[0-9]{4}-[0-9]{2}$' || { echo "Not an edition id: $edition"; exit 1; }
+          st=$(echo "$state" | tr '[:upper:]' '[:lower:]')
+          { echo "state=$state"; echo "st=$st"; echo "edition=$edition"; echo "publish=$publish"; } >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build map shapes
+        if: inputs.places != ''
+        env:
+          STATE: ${{ steps.req.outputs.state }}
+          PLACES: ${{ inputs.places }}
+        run: |
+          pip install pyshp==2.3.1 pyproj==3.7.1
+          mapfile -t places < <(python -c 'import os, shlex; print("\n".join(shlex.split(os.environ["PLACES"])))')
+          python -I pipeline/geo.py --state "$STATE" --places "${places[@]}"
+
+      - name: Build the data
+        env:
+          STATE: ${{ steps.req.outputs.state }}
+          EDITION: ${{ steps.req.outputs.edition }}
+        run: python -I pipeline/income_targeting.py --state "$STATE" --edition "$EDITION"
+
+      - name: Compare with the published edition
+        env:
+          ST: ${{ steps.req.outputs.st }}
+          EDITION: ${{ steps.req.outputs.edition }}
+        run: |
+          {
+            echo "## Income targeting: ${ST^^}, edition $EDITION"
+            echo
+            python -I pipeline/check_income.py "pipeline/out/$ST/income-targeting/$EDITION" "src/data/$ST/income-targeting/$EDITION"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: income-targeting-${{ steps.req.outputs.st }}-${{ steps.req.outputs.edition }}
+          path: pipeline/out/${{ steps.req.outputs.st }}/income-targeting/${{ steps.req.outputs.edition }}/
+
+      - name: Commit the data
+        if: steps.req.outputs.publish == 'true'
+        env:
+          STATE: ${{ steps.req.outputs.state }}
+          ST: ${{ steps.req.outputs.st }}
+          EDITION: ${{ steps.req.outputs.edition }}
+          BRANCH: ${{ github.head_ref || github.ref_name }}
+        run: |
+          test -f "src/data/$ST/geo-2020.json" || { echo "No map shapes for $STATE: run again with places."; exit 1; }
+          rm -rf "src/data/$ST/income-targeting/$EDITION"
+          python -I pipeline/income_targeting.py --state "$STATE" --edition "$EDITION" --publish
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "src/data/$ST" pipeline/sources.lock.json
+          if git diff --cached --quiet; then echo "No changes to commit."; exit 0; fi
+          git commit -m "Build the $STATE income targeting data from Census downloads ($EDITION)"
+          git push origin "HEAD:$BRANCH"
