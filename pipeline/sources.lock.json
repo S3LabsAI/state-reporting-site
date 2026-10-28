@@ -3,25 +3,31 @@
   "url": "https://www2.census.gov/programs-surveys/acs/summary_file/2024/table-based-SF/data/5YRData/acsdt5y2024-b11001.dat",
   "bytes": 45827971,
   "sha256": "77200c3d9c0d99773bc7f78208bc96f25170e5d4d175a5de320620b478ceaff5",
-  "fetched": "2026-10-08"
+  "fetched": "2026-10-28"
  },
  "acs/acsdt5y2024-b19013.dat": {
   "url": "https://www2.census.gov/programs-surveys/acs/summary_file/2024/table-based-SF/data/5YRData/acsdt5y2024-b19013.dat",
   "bytes": 17917916,
   "sha256": "b25a176b0e6c339b6f3a2a0d3d8446bf06f5f080b4395993ec9a8313efb1c229",
-  "fetched": "2026-10-08"
+  "fetched": "2026-10-28"
  },
  "acs/acsdt5y2024-b25003.dat": {
   "url": "https://www2.census.gov/programs-surveys/acs/summary_file/2024/table-based-SF/data/5YRData/acsdt5y2024-b25003.dat",
   "bytes": 26901770,
   "sha256": "68e963e1ed60fcf6b0658579cefc6498b7a9eb780b9f3e87fd1b9775c4d4ac6c",
-  "fetched": "2026-10-08"
+  "fetched": "2026-10-28"
+ },
+ "acs/acsdt5y2024-b25077.dat": {
+  "url": "https://www2.census.gov/programs-surveys/acs/summary_file/2024/table-based-SF/data/5YRData/acsdt5y2024-b25077.dat",
+  "bytes": 18496426,
+  "sha256": "89eb2153764a2330b23959d8bbc29b3a8f3016f087b990f2a8ea0d5096d9a816",
+  "fetched": "2026-10-28"
  },
  "census/2024_Gaz_counties_national.zip": {
   "url": "https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2024_Gazetteer/2024_Gaz_counties_national.zip",
   "bytes": 141679,
   "sha256": "3c337402b5c6e8d5aa26b4278ccf4edc8989f2683765b3ffbf22296cdb2df3a0",
-  "fetched": "2026-10-08"
+  "fetched": "2026-10-28"
  },
  "census/cb_2020_us_county_500k.zip": {
   "url": "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_us_county_500k.zip",
@@ -47,11 +53,17 @@
   "sha256": "da4051717caec55c75e3748c3608c2a3dbde8d1ff401bbaf4f952e3c3fb63ef1",
   "fetched": "2026-10-08"
  },
+ "census/list1_2023.xlsx": {
+  "url": "https://www2.census.gov/programs-surveys/metro-micro/geographies/reference-files/2023/delineation-files/list1_2023.xlsx",
+  "bytes": 143798,
+  "sha256": "952c4b1e78acbb54e6ec9412434b7602fedacbf021736351a63c181bdb753629",
+  "fetched": "2026-10-28"
+ },
  "census/tab20_zcta520_county20_natl.txt": {
   "url": "https://www2.census.gov/geo/docs/maps-data/data/rel2020/zcta520/tab20_zcta520_county20_natl.txt",
   "bytes": 6821287,
   "sha256": "3ed41278d637dc249e0323306f68be8a6c234e3090f4de88ef328dee71aeaaaf",
-  "fetched": "2026-10-08"
+  "fetched": "2026-10-28"
  },
  "census/tab20_zcta520_tabblock20_st40.txt": {
   "url": "https://www2.census.gov/geo/docs/maps-data/data/rel2020/zcta520/tab20_zcta520_tabblock20_natl.txt",
@@ -74,9 +86,9 @@
  },
  "geonames/US.zip": {
   "url": "https://download.geonames.org/export/zip/US.zip",
-  "bytes": 634329,
-  "sha256": "7e34efabd0a38185ec9897589b5edffa57cb3ad9be74a995da07e1c719cf54cf",
-  "fetched": "2026-10-08"
+  "bytes": 634328,
+  "sha256": "f609a76cda56cd00dc5a8aad090087f092d6294b3ce6e9c6671b14f74006bbc4",
+  "fetched": "2026-10-28"
  },
  "noaa/1950-2025_actual_tornadoes.csv": {
   "url": "https://www.spc.noaa.gov/wcm/data/1950-2025_actual_tornadoes.csv",
