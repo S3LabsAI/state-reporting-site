@@ -14,6 +14,8 @@ belong in this repo.
 | `/ca` | California reports |
 | `/ca/brush-fire-risk` | California Brush Fire Risk by ZIP Code (research brief) |
 | `/ca/demographics` | California Demographics by ZIP Code (research brief) |
+| `/tx` | Texas reports |
+| `/tx/income-targeting` | Texas Income Targeting by ZIP Code (current edition) |
 
 Report links can open on a layer, view, area or region, for example
 `/ok/home-risk?layer=fire&view=county&county=comanche` or `/ok/home-risk?region=southwest`.
@@ -41,7 +43,23 @@ npm run build    # writes _site/
    boundaries for any state; a state taller than it is wide is letterboxed on cards and in the map).
 3. Add the state to `src/_data/site.json` if it is new.
 
-No template, script or stylesheet changes are needed.
+Any config text can quote the edition's headline figures from `meta.json` (`{q3:money}`,
+`{coreShare}`), and a `bars` chart can read its groups from `meta.charts` with `"groupsFrom"` (plus an
+optional `"unit"` such as `%`), so one config works for every edition. No template, script or
+stylesheet changes are needed.
+
+## Add an income targeting report for another state
+
+The income targeting report works for any state: copy `src/_data/reports/tx-income-targeting.json` to
+`<st>-income-targeting.json`, change the state, title, eyebrow, map places and the state name in the text,
+then build the data and shapes:
+
+```bash
+.venv/bin/python pipeline/geo.py --state GA --places "Atlanta:-84.39,33.75" "Savannah:-81.10,32.08" ...
+.venv/bin/python pipeline/income_targeting.py --state GA --edition 2026-10 --publish
+```
+
+Every figure in the text comes from the edition's `meta.json`, so nothing else needs rewriting.
 
 ## Add a research brief
 
@@ -81,6 +99,7 @@ uv venv --python 3.12 && uv pip install -r pipeline/requirements.txt
 .venv/bin/python pipeline/usfs.py --state OK
 .venv/bin/python pipeline/home_risk.py --state OK --edition 2026-10
 .venv/bin/python pipeline/hail_exposure.py --state IL --edition 2026-10
+.venv/bin/python pipeline/income_targeting.py --state TX --edition 2026-10
 ```
 
 `npm run check` compares the site data with the original map it was extracted from (that file is

@@ -17,6 +17,11 @@
       "name": "Illinois",
       "postal": "IL",
       "intro": "Hail exposure for all 102 Illinois counties and the 484 ZIP codes in the top 15, ranked by where roof-damaging hail meets owner-occupied homes. Use them to decide where your agency spends on leads and inbound calls."
+    },
+    "tx": {
+      "name": "Texas",
+      "postal": "TX",
+      "intro": "Median household income for every Texas ZIP code and county, with the top-quartile target list and the core ZIPs large enough to act on. Use it to decide which ZIPs your agency targets for home and auto, then test the list against your own leads."
     }
   }
 }

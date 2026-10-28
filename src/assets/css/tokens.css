@@ -75,6 +75,9 @@
   /* Charts: main series, comparison series, muted series */
   --bar-a: var(--brand); --bar-b: #9fd0ff; --bar-c: #1f4670;
 
+  /* Map: income quartiles and owner occupancy in market maps (lighter = higher) */
+  --iq-0: #1f3a5c; --iq-1: #1f5f9e; --iq-2: #2b86da; --iq-3: #9fd0ff;
+
   /* Dot maps in research briefs: median household income (lighter = higher), urban renter cores */
   --inc-0: #1d3a5c; --inc-1: #1f5f9e; --inc-2: #2b86da; --inc-3: #64adf2; --inc-4: #b4dbff;
   --dot-other: #2a3442; --dot-nodata: #1b222b;

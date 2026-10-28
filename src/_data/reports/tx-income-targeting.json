@@ -1,0 +1,278 @@
+{
+  "id": "tx-income-targeting",
+  "template": "heatmap",
+  "state": "tx",
+  "slug": "income-targeting",
+  "title": "Texas Income Targeting by ZIP Code",
+  "shortTitle": "Income Targeting",
+  "eyebrow": "Texas Home and Auto Market",
+  "summary": "Median household income for all {zips} Texas ZIP codes and {counties} counties, cut into statewide quartiles. The top quartile is the target list, and its core ZIPs are the ones large and precise enough to act on.",
+  "card": "Median household income by ZIP code and county, with the top-quartile target list and the core ZIPs that hold most target households.",
+  "sourcesShort": "the U.S. Census Bureau",
+  "sources": ["U.S. Census Bureau ACS 2020-2024", "Census 2020 ZCTA relationship files", "OMB metro delineation 2023", "GeoNames"],
+  "tags": {
+    "line": ["home", "auto"],
+    "perils": [],
+    "context": ["market"],
+    "format": "market-map",
+    "geography": ["zip", "county"]
+  },
+  "geo": "/data/tx/geo-2020.json",
+  "edition": { "id": "2026-10", "label": "October 2026", "data": "/data/tx/income-targeting/2026-10/" },
+  "map": {
+    "ariaLabel": "Map of Texas colored by median household income",
+    "weight": "households",
+    "weightLabel": "Texas households",
+    "places": ["Dallas", "Fort Worth", "Houston", "Austin", "San Antonio", "El Paso", "Midland", "Lubbock", "Amarillo", "Corpus Christi", "McAllen", "Laredo"],
+    "tierLabels": ["Bottom 25%", "Second 25%", "Third 25%", "Top 25%"],
+    "tierRanges": ["under {q1:money}", "{q1:money} to {q2:money}", "{q2:money} to {q3:money}", "{q3:money} and up"],
+    "views": [
+      { "id": "zip", "label": "ZIP Codes", "unit": "ZIPs", "titleSuffix": "by ZIP Code" },
+      { "id": "county", "label": "Counties", "unit": "counties", "titleSuffix": "by County", "lines": true }
+    ],
+    "layers": [
+      {
+        "id": "target",
+        "label": "Target List",
+        "legendTitle": "Target Status",
+        "highlight": true,
+        "blurb": "The top quarter of ZIP codes by median household income, {q3:money} and up. Core ZIPs have at least {coreMinHouseholds} households and a margin of error under {coreMaxMoe}%.",
+        "byView": {
+          "zip": {
+            "type": "category",
+            "fullTitle": "Top 25% Target ZIP Codes",
+            "note": "Blue ZIP codes are in the top quarter of Texas ZIP codes by median household income. Dark blue ones are too small or too noisy to rely on.",
+            "noData": { "field": "status", "lt": 0 },
+            "categories": [
+              { "label": "Core target", "color": "prime", "when": { "field": "status", "eq": 2 } },
+              { "label": "Target, low confidence", "color": "t3", "when": { "field": "status", "eq": 1 } },
+              { "label": "Below the line", "color": "other" }
+            ],
+            "legendFoot": "Share of homes = share of Texas households. Black areas have no published median income."
+          },
+          "county": {
+            "type": "share",
+            "fullTitle": "Households in Target ZIP Codes, by County",
+            "note": "Shading shows the share of each county's households that live in target ZIP codes.",
+            "field": "targetHouseholds",
+            "of": "households",
+            "color": "prime",
+            "base": "other",
+            "legend": [
+              { "label": "No target ZIPs", "mix": 0, "countZero": true },
+              { "label": "Some households in target ZIPs", "mix": 50 },
+              { "label": "Most households in target ZIPs", "mix": 100 }
+            ],
+            "legendFoot": "A county is shaded by the ZIP codes whose largest land share falls in it. Switch to ZIP codes to see each one."
+          }
+        }
+      },
+      {
+        "id": "quartile",
+        "label": "Income Quartile",
+        "type": "tier",
+        "score": "incomeText",
+        "tier": "quartile",
+        "ramp": "iq",
+        "title": "Median Household Income",
+        "legendTitle": "ZIP Income Quartile",
+        "blurb": "Every ZIP code in its statewide income quartile. Each quartile holds a quarter of ZIP codes, not of households.",
+        "note": "Each ZIP code counted once. Lighter ZIP codes have higher median household income.",
+        "legendFoot": "Share of homes = share of Texas households. Quartiles rank ZIP codes within Texas.",
+        "byView": {
+          "county": {
+            "type": "category",
+            "fullTitle": "County Income Quartile",
+            "legendTitle": "County Income Quartile",
+            "note": "Counties ranked against the {counties} Texas counties. County medians average away the spread between ZIP codes.",
+            "noData": { "field": "quartile", "lt": 0 },
+            "categories": [
+              { "label": "Top 25%, {countyLine:money} and up", "color": "iq-3", "when": { "field": "quartile", "eq": 3 } },
+              { "label": "Third 25%, {cq2:money} to {countyLine:money}", "color": "iq-2", "when": { "field": "quartile", "eq": 2 } },
+              { "label": "Second 25%, {cq1:money} to {cq2:money}", "color": "iq-1", "when": { "field": "quartile", "eq": 1 } },
+              { "label": "Bottom 25%, under {cq1:money}", "color": "iq-0" }
+            ],
+            "legendFoot": "Share of homes = share of Texas households."
+          }
+        }
+      },
+      {
+        "id": "owners",
+        "label": "Homeownership",
+        "type": "category",
+        "title": "Owner Occupancy",
+        "legendTitle": "Owner-Occupied Share of Homes",
+        "blurb": "The share of occupied homes that are owner-occupied, the better screen for home and bundle campaigns.",
+        "note": "High income does not mean homeowner. Use this layer next to the target list for home and bundle campaigns.",
+        "noData": { "field": "households", "lt": 1 },
+        "categories": [
+          { "label": "80% or more", "color": "iq-3", "when": { "field": "ownerRate", "gt": 79.95 } },
+          { "label": "65% to 80%", "color": "iq-2", "when": { "field": "ownerRate", "gt": 64.95 } },
+          { "label": "50% to 65%", "color": "iq-1", "when": { "field": "ownerRate", "gt": 49.95 } },
+          { "label": "Under 50% (majority renter)", "color": "iq-0" }
+        ],
+        "legendFoot": "Share of homes = share of Texas households. Statewide, {stateOwnerRate}% of occupied homes are owner-occupied."
+      }
+    ],
+    "overlays": [],
+    "search": {
+      "label": "Find a ZIP or Town",
+      "placeholder": "75035 or Frisco"
+    }
+  },
+  "detail": {
+    "zip": {
+      "title": "{name} {id}",
+      "sub": "{county} County · {metro}",
+      "rows": [
+        { "label": "Median household income", "layer": "quartile" },
+        { "label": "Margin of error", "text": "{moeText}" },
+        { "label": "Households", "text": "{households:int}" },
+        { "label": "Owner-occupied", "text": "{ownerRate:pct1}" },
+        { "label": "Median home value", "text": "{homeValueText}" }
+      ],
+      "chips": [
+        { "when": { "field": "status", "eq": 2 }, "text": "Core target ZIP", "style": "prime" },
+        { "when": { "field": "status", "eq": 1 }, "text": "Target, low confidence" }
+      ]
+    },
+    "county": {
+      "title": "{name} County",
+      "sub": "{metro}",
+      "rows": [
+        { "label": "Median household income", "text": "{incomeText}" },
+        { "label": "Households", "text": "{households:int}" },
+        { "label": "Owner-occupied", "text": "{ownerRate:pct1}" },
+        { "label": "Target ZIPs", "text": "{targetZips} of {zips} ({coreZips} core)" },
+        { "label": "Households in its target ZIPs", "text": "{targetHouseholds:int}" },
+        { "label": "Bottom-quartile ZIPs", "text": "{bottomZips}" }
+      ],
+      "chips": [
+        { "when": { "field": "top", "eq": 1 }, "text": "Top-quartile county", "style": "prime" }
+      ]
+    }
+  },
+  "stats": [
+    { "value": "{stateMedian:money}", "label": "Texas median household income, against {usMedian:money} for the United States" },
+    { "value": "{q3:money}", "label": "income floor for the top 25% of Texas ZIP codes, the {targetZips}-ZIP target list" },
+    { "value": "{coreZips}", "highlight": true, "label": "core target ZIP codes, holding {coreShare:pct1} of Texas households" },
+    { "value": "{metro4Share}", "unit": "%", "label": "of target households live in the {metro4Names} metros" }
+  ],
+  "tiles": [
+    { "value": "{targetZips}", "label": "Target ZIPs" },
+    { "value": "{coreZips}", "label": "Core Target ZIPs" },
+    { "value": "{zips}", "label": "ZIPs Profiled" }
+  ],
+  "images": { "hero": "target", "card": "quartile" },
+  "sections": [
+    {
+      "kind": "table",
+      "id": "core-zips",
+      "nav": "Top Core ZIPs",
+      "title": "Largest Core Target ZIPs",
+      "titleSub": "Ranked by Households.",
+      "intro": "The {limit} largest of the {coreZips} core target ZIP codes. Core ZIPs hold {coreShare}% of Texas households; the other {lowConfZips} target ZIPs hold only {lowConfHouseholds:int} households between them.",
+      "view": "zip",
+      "where": { "field": "status", "eq": 2 },
+      "sort": "coreRank",
+      "limit": 20,
+      "columns": [
+        { "label": "Rank", "text": "#{coreRank}", "style": "rank" },
+        { "label": "ZIP", "text": "{id}", "style": "strong" },
+        { "label": "Town", "text": "{name}" },
+        { "label": "County", "text": "{county}" },
+        { "label": "Median Income", "text": "{incomeText}", "align": "end" },
+        { "label": "Households", "text": "{households:int}", "align": "end" },
+        { "label": "Owner-Occupied", "text": "{ownerRate:pct1}", "align": "end" },
+        { "label": "Median Home Value", "text": "{homeValueText}", "align": "end" }
+      ]
+    },
+    {
+      "kind": "bars",
+      "id": "where",
+      "nav": "Where Targets Live",
+      "title": "Where Target Households Live",
+      "titleSub": "Mostly Four Metros.",
+      "intro": "{metro4Share}% of households in target ZIP codes are in the {metro4Names} metros. Outside metros, {nonMetroTargets} ZIP codes clear the line on paper, but only {nonMetroCore} are large and precise enough to be core.",
+      "charts": [
+        {
+          "title": "Share of Target Households by Metro",
+          "series": [{ "label": "Percent of target households", "color": "bar-a" }],
+          "groupsFrom": "metros",
+          "unit": "%",
+          "foot": "Metro areas from the OMB July 2023 delineation, by each ZIP code's county."
+        },
+        {
+          "title": "Texas Households by ZIP Income Quartile",
+          "series": [{ "label": "Percent of Texas households", "color": "bar-b" }],
+          "groupsFrom": "quartiles",
+          "unit": "%",
+          "foot": "Each quartile holds a quarter of ZIP codes. The top quartile holds {targetShare}% of households because high-income ZIP codes are larger."
+        }
+      ]
+    },
+    {
+      "kind": "table",
+      "id": "counties",
+      "nav": "Counties",
+      "title": "Counties Above the Line",
+      "titleSub": "Too Blunt to Target.",
+      "intro": "{topCounties} of {counties} counties have a median household income of {countyLine:money} or more, the top quarter of Texas counties. Together they hold {topCountyShare}% of Texas households and {bluntZips} bottom-quartile ZIP codes. The {limit} largest:",
+      "view": "county",
+      "where": { "field": "top", "eq": 1 },
+      "sort": "countyRank",
+      "limit": 10,
+      "columns": [
+        { "label": "County", "text": "{name}", "style": "strong" },
+        { "label": "Metro", "text": "{metro}" },
+        { "label": "Median Income", "text": "{incomeText}", "align": "end" },
+        { "label": "Households", "text": "{households:int}", "align": "end" },
+        { "label": "Target ZIPs", "text": "{targetZips} of {zips}", "align": "end" },
+        { "label": "Bottom-Quartile ZIPs", "text": "{bottomZips}", "align": "end" }
+      ]
+    },
+    {
+      "kind": "facts",
+      "id": "zip-vs-county",
+      "items": [
+        { "eyebrow": "ZIP target list", "value": "{targetZips} ZIPs", "text": "{targetShare}% of Texas households. The {coreZips} core ZIPs alone hold {coreShare}%." },
+        { "eyebrow": "County target list", "value": "{topCounties} counties", "text": "{topCountyShare}% of Texas households, with {bluntZips} bottom-quartile ZIP codes inside them." },
+        { "eyebrow": "Stricter cut", "value": "{strictFloor:money}", "text": "The ZIPs holding the top quarter of households instead of the top quarter of ZIPs: {strictZips} ZIPs, {strictShare}% of households." }
+      ]
+    },
+    {
+      "kind": "notes",
+      "id": "read-with-care",
+      "nav": "Read With Care",
+      "title": "Where Income Misleads",
+      "titleSub": "Four Blind Spots.",
+      "intro": "Median income is an area average. Four things to check before it drives a targeting change.",
+      "items": [
+        { "title": "High Income Is Not Homeownership", "text": "Income and owner occupancy correlate at only {incomeOwnerCorr} across ZIP codes with 500 or more households. {renterTargets} target ZIPs holding {renterTargetHouseholds:int} households are majority renter. For home and bundle campaigns, check the Homeownership layer." },
+        { "title": "Students and Transient Workers", "text": "College ZIP codes post very low medians that describe students, not the local market. Energy and military ZIP codes can pass an income screen on a workforce that does not stay. Judge both on the agency's own results, not their income rank." },
+        { "title": "The Estimate Is Soft", "text": "ACS 5-year values pool 60 months of responses from 2020 to 2024. The median ZIP margin of error is {medianMoe}% of the estimate, and {highMoeZips} ZIP codes are at {coreMaxMoe}% or more. That is why the core list drops small and noisy ZIPs." },
+        { "title": "Income Stands In for Lead Facts", "text": "Prior coverage, credit-based insurance score, driving record and homeowner status decide whether a lead quotes and binds. Where a source filters on currently insured or homeowner, that filter acts on the cause. A ZIP income screen acts on a correlate." }
+      ]
+    },
+    {
+      "kind": "notes",
+      "id": "put-to-work",
+      "nav": "Putting It to Work",
+      "title": "Putting It to Work",
+      "titleSub": "Test Before You Cut.",
+      "intro": "The best use of this list is as a measuring tool for an agency's own leads.",
+      "items": [
+        { "title": "Measure by Quartile First", "text": "Tag each lead with its ZIP's income quartile and core status, then compare contact, quote and bind rates by quartile, by line and by source. A step-down across sources supports a geographic test. Flat rates point to price or sales process." },
+        { "title": "Trim the Bottom Before the Middle", "text": "If the results support a change, deprioritize the weakest bottom-quartile ZIPs before restricting to the top. The third quartile holds {thirdShare}% of Texas households, too much volume to cut on no evidence." },
+        { "title": "Run Core ZIPs as Their Own Segment", "text": "Give the {coreZips} core ZIPs their own segment and bid so their results read apart from the rest of the campaign. Leave out the {lowConfZips} low-confidence ZIPs and keep to the agency's service area." },
+        { "title": "Keep the Rule Explainable", "text": "Insurance law limits refusing or pricing coverage by geography, ad platforms can restrict ZIP targeting for insurance, and an income screen can track race and ethnicity. A rule grounded in the agency's own results and homeownership is easier to explain than income alone. This is not legal advice." }
+      ]
+    }
+  ],
+  "methods": [
+    { "title": "Median Household Income", "text": "ACS 2020-2024 5-year table B19013 for every ZIP Code Tabulation Area and county, in 2024 dollars, with its margin of error. {zipsSuppressed} ZIP codes with too few responses have no published median; they hold {suppressedShare}% of households." },
+    { "title": "Quartiles and the Target List", "highlight": true, "text": "ZIP codes with a published median, each counted once, are cut at the 25th, 50th and 75th percentiles: {q1:money}, {q2:money} and {q3:money}. The top quartile is the target list. Counties get their own quartiles across the {counties} Texas counties." },
+    { "title": "Core Target ZIPs", "text": "A target ZIP with at least {coreMinHouseholds} households and a margin of error under {coreMaxMoe}% of the estimate. Top-coded medians ($250,000 or more) have no margin and pass on households alone. The other {lowConfZips} target ZIPs are flagged low confidence." },
+    { "title": "Counties, Metros and ZIPs", "text": "Each ZIP code takes the county holding the largest share of its land (Census 2020 relationship file) and that county's metro area (OMB July 2023 delineation). ZIP areas are Census ZCTAs, so PO-box-only ZIPs and ZIPs created after 2020 have no row. Town names from GeoNames." }
+  ]
+}

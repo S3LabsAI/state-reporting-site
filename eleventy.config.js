@@ -15,6 +15,8 @@ const MAP_COLORS = {
   prime: '#057be5', review: '#56637a', other: '#1e2834', nodata: '#12171d',
   edge: '#0d1117', state: '#64748b',
   // Dot maps in research briefs
+  // Income quartiles and owner occupancy in market maps (lighter = higher)
+  'iq-0': '#1f3a5c', 'iq-1': '#1f5f9e', 'iq-2': '#2b86da', 'iq-3': '#9fd0ff',
   'inc-0': '#1d3a5c', 'inc-1': '#1f5f9e', 'inc-2': '#2b86da', 'inc-3': '#64adf2', 'inc-4': '#b4dbff',
   'dot-other': '#2a3442', 'dot-nodata': '#1b222b', renter: '#057be5', core900: '#b4dbff',
 };
@@ -73,6 +75,19 @@ function dotMapSvg(m) {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${x} 0 ${w} ${h}" width="1000" height="525">${dots}</svg>`;
 }
 
+// Report text can quote the edition's headline figures, for example "{q3:money} and up". Only keys found
+// in meta.stats are filled; other {field} templates (area details, filled in the browser) are left alone.
+function fillStats(value, stats) {
+  if (typeof value === 'string') {
+    return value.replace(/\{([\w.]+)(?::(\w+))?\}/g, (m, key) => key in stats ? fill(m, stats) : m);
+  }
+  if (Array.isArray(value)) return value.map(v => fillStats(v, stats));
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, k === 'detail' ? v : fillStats(v, stats)]));
+  }
+  return value;
+}
+
 // Rows for a table section: one cell per column, filled from the area's record.
 function tableRows(report, T, attrs) {
   const M = report.map;
@@ -89,16 +104,18 @@ function tableRows(report, T, attrs) {
 }
 
 // The sections shown after the map, in order: tables, bar charts, fact cards and notes. A report
-// with only `table` gets that one table. Tables get their rows; bar charts get bar heights.
-function sections(report, attrs) {
+// with only `table` gets that one table. Tables get their rows; bar charts get bar heights. A chart with
+// `groupsFrom` takes its groups from the edition's meta.charts, and `unit` follows each bar's value.
+function sections(report, attrs, meta) {
   const list = report.sections || (report.table ? [{ kind: 'table', ...report.table }] : []);
   return list.map(s => {
     if (s.kind === 'table') return { ...s, rows: tableRows(report, s, attrs) };
     if (s.kind === 'bars') {
-      return { ...s, charts: s.charts.map(c => {
+      return { ...s, charts: s.charts.map(chart => {
+        const c = chart.groupsFrom ? { ...chart, groups: meta.charts[chart.groupsFrom] } : chart;
         const max = Math.max(...c.groups.flatMap(g => g.values));
         return { ...c, groups: c.groups.map(g => ({ ...g, bars: g.values.map((v, i) => ({
-          value: v.toLocaleString('en-US'), pct: +(v / max * 100).toFixed(1),
+          value: v.toLocaleString('en-US') + (c.unit || ''), pct: +(v / max * 100).toFixed(1),
           color: c.series[g.series ?? i].color })) })) };
       }) };
     }
@@ -112,8 +129,9 @@ function reportPages() {
   if (cache) return cache;
   const dir = path.join(SRC, '_data/reports');
   cache = fs.readdirSync(dir).filter(f => f.endsWith('.json')).sort().map(file => {
-    const report = readJson(path.join(dir, file));
-    const meta = readJson(path.join(SRC, report.edition.data, 'meta.json'));
+    const raw = readJson(path.join(dir, file));
+    const meta = readJson(path.join(SRC, raw.edition.data, 'meta.json'));
+    const report = fillStats(raw, meta.stats || {});
     const url = `/${report.state}/${report.slug}/`;
     // Research briefs: dot maps drawn at build time from the edition's maps.json, and one
     // static image (report.images.card names the map) for the cards.
@@ -126,7 +144,7 @@ function reportPages() {
     // Static map images, one per layer, in the first view.
     const view = report.map.views[0].id;
     const images = Object.fromEntries(report.map.layers.map(l => [l.id, `${url}map-${l.id}.svg`]));
-    return { report, edition: report.edition, meta, url, images, view, sections: sections(report, attrs) };
+    return { report, edition: report.edition, meta, url, images, view, sections: sections(report, attrs, meta) };
   });
   return cache;
 }
