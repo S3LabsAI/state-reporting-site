@@ -6,7 +6,7 @@ Usage:
 
 Writes attrs.json and meta.json to pipeline/out/<st>/income-targeting/<edition>/ for review, or to
 src/data/<st>/income-targeting/<edition>/ with --publish (never over an existing folder). Map shapes come
-from pipeline/geo.py, which keeps the same ZIP codes (every ZCTA with land in one of the state's counties).
+from pipeline/geo.py. ZIP codes are the ZCTAs with more than half their land in the state.
 
 Method (see pipeline/sources.md):
 - Income: ACS 5-year median household income (B19013) for every ZCTA and county, with its margin of error.
@@ -124,10 +124,12 @@ def gather(state, edition):
     """Raw ZIP and county rows for one state, from the ACS summary files and Census relationship files."""
     settings = EDITIONS[edition]
     fips = sources.STATES[state][0]
-    land, _ = zcta_land(fips)
+    land, land_total = zcta_land(fips)
     counties = county_names(fips, settings["gazetteer_year"])
     metros = cbsa_counties(fips, settings["cbsa_year"])
-    zips = sorted(land)
+    # ZCTAs with more than half their land in the state, the rule the home risk report uses. A border
+    # ZCTA that is mostly another state's belongs to that state's report.
+    zips = sorted(z for z in land if land_total[z] and sum(land[z].values()) / land_total[z] > 0.5)
 
     year = settings["acs_year"]
     geo_ids = ({f"860Z200US{z}" for z in zips} | {f"0500000US{c}" for c in counties}
