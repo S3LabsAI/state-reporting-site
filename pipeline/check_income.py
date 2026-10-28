@@ -46,6 +46,18 @@ def main():
         out += ["", f"ZIP codes in both: {len(both)} (only in this build: {len(mine.keys() - theirs.keys())}, "
                     f"only in published: {len(theirs.keys() - mine.keys())}).",
                 f"Quartile changed: {q}. Target status changed: {st}."]
+        row = lambda z: f"{z['id']} {z.get('name')} ({z['county']}): {z['incomeText']}, {z['households']:,} households"
+        for label, ids in (("Only in this build", sorted(mine.keys() - theirs.keys())),
+                           ("Only in published", sorted(theirs.keys() - mine.keys())),
+                           ("Quartile changed", sorted(z for z in both if mine[z]["quartile"] != theirs[z]["quartile"])),
+                           ("Target status changed", sorted(z for z in both if mine[z]["status"] != theirs[z]["status"]))):
+            if ids:
+                out += ["", f"{label}:"] + [f"- {row(mine.get(z) or theirs[z])}" + (
+                    f" (quartile {theirs[z]['quartile'] + 1} to {mine[z]['quartile'] + 1}, status {theirs[z]['status']} to "
+                    f"{mine[z]['status']})" if z in both else "") for z in ids[:15]]
+        fields = ["incomeText", "households", "ownerRate", "homeValueText", "name", "county", "metro"]
+        changed = {f: sum(1 for z in both if mine[z].get(f) != theirs[z].get(f)) for f in fields}
+        out += ["", "ZIP fields that differ: " + ", ".join(f"{f} {n}" for f, n in changed.items())]
     print("\n".join(out))
 
 
