@@ -61,6 +61,12 @@ then build the data and shapes:
 
 Every figure in the text comes from the edition's `meta.json`, so nothing else needs rewriting.
 
+The Census servers can also be reached from GitHub instead of a local machine: run the **Income
+targeting data** workflow from the Actions tab with the state (and `places` for a new state's map), or
+add the label `income-pipeline TX` to a pull request. It shows the build next to the published edition in
+the run summary, and with `publish` (or the label `income-pipeline TX publish`) commits the data to the
+branch.
+
 ## Add a research brief
 
 Briefs (`"template": "brief"`) are static reports: figures, dot maps, bar charts, tables and fact
