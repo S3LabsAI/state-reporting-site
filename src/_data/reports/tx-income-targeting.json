@@ -23,7 +23,7 @@
     "ariaLabel": "Map of Texas colored by median household income",
     "weight": "households",
     "weightLabel": "Texas households",
-    "places": ["Dallas", "Fort Worth", "Houston", "Austin", "San Antonio", "El Paso", "Midland", "Lubbock", "Amarillo", "Corpus Christi", "McAllen", "Laredo"],
+    "places": ["Dallas", "Houston", "Austin", "San Antonio", "El Paso", "Midland", "Lubbock", "Amarillo", "Corpus Christi", "McAllen", "Laredo"],
     "tierLabels": ["Bottom 25%", "Second 25%", "Third 25%", "Top 25%"],
     "tierRanges": ["under {q1:money}", "{q1:money} to {q2:money}", "{q2:money} to {q3:money}", "{q3:money} and up"],
     "views": [

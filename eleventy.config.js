@@ -117,7 +117,7 @@ function sections(report, attrs, meta) {
         const c = chart.groupsFrom ? { ...chart, groups: meta.charts[chart.groupsFrom] } : chart;
         const max = Math.max(...c.groups.flatMap(g => g.values));
         return { ...c, groups: c.groups.map(g => ({ ...g, bars: g.values.map((v, i) => ({
-          value: v.toLocaleString('en-US') + (c.unit || ''), pct: +(v / max * 100).toFixed(1),
+          value: (c.unit === '%' ? v.toFixed(1) : v.toLocaleString('en-US')) + (c.unit || ''), pct: +(v / max * 100).toFixed(1),
           color: c.series[g.series ?? i].color })) })) };
       }) };
     }
