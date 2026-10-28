@@ -272,7 +272,7 @@ def build(zip_rows, county_rows, state_vals, us_vals):
         "strictFloor": strict[-1]["income"] if strict else None, "strictZips": len(strict),
         "strictHouseholds": held(strict), "strictShare": pct1(held(strict), state_hh),
         "renterTargets": len(renter_targets), "renterTargetHouseholds": held(renter_targets),
-        "incomeOwnerCorr": round(correlation([(z["income"], z["ownerRate"]) for z in solid if z["ownerRate"] is not None]), 2),
+        "incomeOwnerCorr": f"{correlation([(z['income'], z['ownerRate']) for z in solid if z['ownerRate'] is not None]):.2f}",
         "medianMoe": round(statistics.median(moes), 1), "highMoeZips": sum(1 for m in moes if m >= CORE_MAX_MOE),
         "coreMinHouseholds": CORE_MIN_HOUSEHOLDS, "coreMaxMoe": int(CORE_MAX_MOE),
     }

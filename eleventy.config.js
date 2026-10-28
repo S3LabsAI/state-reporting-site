@@ -76,14 +76,16 @@ function dotMapSvg(m) {
 }
 
 // Report text can quote the edition's headline figures, for example "{q3:money} and up". Only keys found
-// in meta.stats are filled; other {field} templates (area details, filled in the browser) are left alone.
+// in meta.stats are filled. Templates filled from other records (area details, table columns and region
+// figures) are left alone, even where one of their fields shares a name with a headline figure.
+const AREA_TEMPLATES = new Set(['detail', 'columns', 'regions']);
 function fillStats(value, stats) {
   if (typeof value === 'string') {
     return value.replace(/\{([\w.]+)(?::(\w+))?\}/g, (m, key) => key in stats ? fill(m, stats) : m);
   }
   if (Array.isArray(value)) return value.map(v => fillStats(v, stats));
   if (value && typeof value === 'object') {
-    return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, k === 'detail' ? v : fillStats(v, stats)]));
+    return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, AREA_TEMPLATES.has(k) ? v : fillStats(v, stats)]));
   }
   return value;
 }

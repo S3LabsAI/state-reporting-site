@@ -6,7 +6,7 @@
   "title": "Texas Income Targeting by ZIP Code",
   "shortTitle": "Income Targeting",
   "eyebrow": "Texas Home and Auto Market",
-  "summary": "Median household income for all {zips} Texas ZIP codes and {counties} counties, cut into statewide quartiles. The top quartile is the target list, and its core ZIPs are the ones large and precise enough to act on.",
+  "summary": "Median household income for all {zips:int} Texas ZIP codes and {counties} counties, cut into statewide quartiles. The top quartile is the target list, and its core ZIPs are the ones large and precise enough to act on.",
   "card": "Median household income by ZIP code and county, with the top-quartile target list and the core ZIPs that hold most target households.",
   "sourcesShort": "the U.S. Census Bureau",
   "sources": ["U.S. Census Bureau ACS 2020-2024", "Census 2020 ZCTA relationship files", "OMB metro delineation 2023", "GeoNames"],
