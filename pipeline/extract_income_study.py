@@ -1,5 +1,8 @@
 """Phase 1 only: lift a state's income targeting data out of the original single-file income study.
 
+The Texas edition has since been rebuilt from Census downloads by income_targeting.py; this script is kept
+for the map shapes it wrote and as a record of how the first draft was made.
+
 Writes
   src/data/<st>/geo-2020.json                            shapes, state outline, city label points
   src/data/<st>/income-targeting/<edition>/attrs.json    ZIP and county values

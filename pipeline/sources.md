@@ -70,7 +70,7 @@ with index 1.0+.
 | Dataset | Release | Used for | Source |
 |---|---|---|---|
 | ACS 5-year table-based summary files | 2020-2024 | B19013 median household income and margin of error, B11001 households, B25003 tenure, B25077 median home value (ZCTA, county, state, U.S.) | www2.census.gov/programs-surveys/acs/summary_file |
-| 2020 ZCTA relationship file | 2020 | Which ZCTAs belong to the state (any land in one of its counties) and each ZCTA's county (largest land share) | www2.census.gov/geo/docs/maps-data/data/rel2020/zcta520 |
+| 2020 ZCTA relationship file | 2020 | Which ZCTAs belong to the state (more than half their land in it) and each ZCTA's county (largest land share) | www2.census.gov/geo/docs/maps-data/data/rel2020/zcta520 |
 | Gazetteer counties | 2024 | County names | www2.census.gov/geo/docs/maps-data/data/gazetteer |
 | OMB metro delineation (list 1) | July 2023 | County to metropolitan area | www2.census.gov/programs-surveys/metro-micro/geographies/reference-files |
 | GeoNames U.S. postal codes | current | Town name for each ZIP code | download.geonames.org/export/zip |
@@ -83,14 +83,16 @@ first principal city unless `METRO_LABELS` gives a name.
 
 ### Texas, October 2026
 
-The Texas edition is Phase 1: its Census values (ACS 2020-2024, the same tables) and map shapes were lifted
-from the original October 1, 2026 Texas income study with `pipeline/extract_income_study.py`; nothing else
-in that study is used. The report figures were then computed by `income_targeting.build()` and match the
-study: quartile breaks $56,550 / $69,977 / $88,084, 437 target ZIPs holding 37.2% of households, 335 core
-ZIPs holding 4,044,267 households, and the same quartile for all 1,989 ZIPs. Two values differ by design:
-the county top-quartile line is $72,417 here (ACS county medians across 254 counties) against the study's
-$72,436, with the same 64 counties above it; and owner-occupied home counts are not published, because the
-study kept only the owner-occupied rate. The next Texas edition runs the full pipeline from downloads.
+The Texas data is built by `income_targeting.py` from the downloads above, on GitHub Actions (the
+**Income targeting data** workflow). It reproduces the original October 1, 2026 Texas income study on
+every figure: the same 1,989 ZIP codes, quartile breaks $56,550 / $69,977 / $88,084, 437 target ZIPs holding
+37.2% of households, 335 core ZIPs holding 4,044,267 households, and the same quartile and target status
+for every ZIP. Two values differ by design: the owner-occupied rate on 62 ZIP codes (owner-occupied homes
+over occupied homes here; the study rounded differently), and the county top-quartile line, $72,417 here
+(ACS county medians) against the study's $72,436, with the same 64 counties above it.
+
+The map shapes (`src/data/tx/geo-2020.json`) and the first draft of the data were lifted from the study with
+`pipeline/extract_income_study.py` (Phase 1); `pipeline/geo.py --state TX` can rebuild the shapes.
 
 ## Method details recovered from the October 2026 edition
 
