@@ -100,6 +100,7 @@ dl.kv dd { text-align: right; font-variant-numeric: tabular-nums; font-weight: 6
 .dtable .rank { font: 700 14px/20px var(--font-display); color: var(--brand-text) }
 .dtable .strong { font-weight: 600 }
 .dtable .soft { color: var(--ink-soft) }
+.dtable .sub { display: block; font-size: 12px; line-height: 16px; font-weight: 400; color: var(--ink-muted) }
 
 /* Bar charts (sections of kind "bars") */
 .charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(480px, 100%), 1fr)); gap: 24px }

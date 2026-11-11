@@ -1,0 +1,337 @@
+{
+  "id": "md-homeowner-market",
+  "template": "heatmap",
+  "state": "md",
+  "slug": "homeowner-market",
+  "title": "Maryland Homeowner Market Brief",
+  "shortTitle": "Homeowner Market Brief",
+  "eyebrow": "Maryland Home and Auto Market",
+  "summary": "Where owner-occupied, higher-income households are concentrated in Maryland, ZIP code by ZIP code, and which ZIP codes hold homes valued under $400,000. Built to decide which ZIP codes to target or expand into for home and auto.",
+  "card": "Owner occupancy, household income and home value by ZIP code, with prime target ZIPs.",
+  "sourcesShort": "the U.S. Census Bureau",
+  "sources": ["U.S. Census Bureau ACS 2020-2024", "U.S. Census Bureau 2020 Census", "GeoNames"],
+  "tags": {
+    "line": ["home", "auto"],
+    "perils": [],
+    "context": ["market"],
+    "format": "market-brief",
+    "geography": ["zip", "county"]
+  },
+  "geo": "/data/md/geo-2020.json",
+  "edition": { "id": "2026-11", "label": "November 2026", "data": "/data/md/homeowner-market/2026-11/" },
+  "map": {
+    "ariaLabel": "Map of Maryland colored by homeowner market measures",
+    "weight": "ownerHomes",
+    "weightLabel": "Maryland owner-occupied homes",
+    "places": ["Baltimore", "Annapolis", "Rockville", "Frederick", "Cumberland", "Waldorf", "Easton", "Salisbury"],
+    "tierLabels": [],
+    "tierRanges": [],
+    "views": [
+      { "id": "zip", "label": "ZIP Codes", "unit": "ZIPs", "titleSuffix": "by ZIP Code" },
+      { "id": "county", "label": "Counties", "unit": "counties", "titleSuffix": "by County", "lines": true }
+    ],
+    "layers": [
+      {
+        "id": "owner",
+        "label": "Owner Occupancy",
+        "type": "category",
+        "title": "Owner-Occupied Rate",
+        "legendTitle": "Owner-Occupied Rate",
+        "blurb": "The share of occupied homes lived in by their owners, in four tiers.",
+        "note": "Owner-occupied homes as a share of occupied homes. 70% and up passes the prime target test.",
+        "noData": { "field": "ownTier", "lt": 0 },
+        "categories": [
+          { "label": "Under 40%", "color": "own-0", "when": { "field": "ownTier", "eq": 0 } },
+          { "label": "40-69%", "color": "own-1", "when": { "field": "ownTier", "eq": 1 } },
+          { "label": "70-89%", "color": "own-2", "when": { "field": "ownTier", "eq": 2 } },
+          { "label": "90% and up", "color": "own-3", "when": { "field": "ownTier", "eq": 3 } }
+        ],
+        "legendFoot": "Share of homes = share of Maryland owner-occupied homes. Areas without occupied homes are not shaded."
+      },
+      {
+        "id": "income",
+        "label": "Household Income",
+        "type": "category",
+        "title": "Median Household Income",
+        "legendTitle": "Median Household Income",
+        "blurb": "Median household income in five bands, with ZIP codes the Census does not publish.",
+        "note": "Median household income from the Census ACS 2020-2024. Gray areas have too few households for the Census to publish a median.",
+        "noData": { "field": "ownTier", "lt": 0 },
+        "categories": [
+          { "label": "Under $60k", "color": "inc-0", "when": { "field": "incomeBand", "eq": 0 } },
+          { "label": "$60-85k", "color": "inc-1", "when": { "field": "incomeBand", "eq": 1 } },
+          { "label": "$85-110k", "color": "inc-2", "when": { "field": "incomeBand", "eq": 2 } },
+          { "label": "$110-150k", "color": "inc-3", "when": { "field": "incomeBand", "eq": 3 } },
+          { "label": "$150k+", "color": "inc-4", "when": { "field": "incomeBand", "eq": 4 } },
+          { "label": "Not published", "color": "review" }
+        ],
+        "legendFoot": "Share of homes = share of Maryland owner-occupied homes."
+      },
+      {
+        "id": "value",
+        "label": "Home Value",
+        "type": "category",
+        "title": "Homes Valued Under $400,000",
+        "legendTitle": "Owner Homes Under $400,000",
+        "blurb": "The share of owner-occupied homes valued under $400,000, as owners estimate it.",
+        "note": "Share of owner-occupied homes the owners value under $400,000. Value includes land and is not replacement cost.",
+        "noData": { "field": "valueBand", "lt": 0 },
+        "categories": [
+          { "label": "Under 25% of homes", "color": "val-0", "when": { "field": "valueBand", "eq": 0 } },
+          { "label": "25-49%", "color": "val-1", "when": { "field": "valueBand", "eq": 1 } },
+          { "label": "50-74%", "color": "val-2", "when": { "field": "valueBand", "eq": 2 } },
+          { "label": "75% and up", "color": "val-3", "when": { "field": "valueBand", "eq": 3 } }
+        ],
+        "legendFoot": "Share of homes = share of Maryland owner-occupied homes. Census value bands: under $400,000 is exact."
+      },
+      {
+        "id": "prime",
+        "label": "Prime Targets",
+        "legendTitle": "Prime Target Status",
+        "highlight": true,
+        "blurb": "At least 70% owner-occupied, income at or above the state median and 1,000 or more owner-occupied homes.",
+        "byView": {
+          "zip": {
+            "type": "category",
+            "fullTitle": "Prime Target ZIP Codes",
+            "note": "Blue ZIP codes pass every prime target test.",
+            "noData": { "field": "ownTier", "lt": 0 },
+            "categories": [
+              { "label": "Prime target", "color": "prime", "when": { "field": "prime", "eq": 1 } },
+              { "label": "Neither", "color": "other" }
+            ],
+            "legendFoot": "Share of homes = share of Maryland owner-occupied homes."
+          },
+          "county": {
+            "type": "share",
+            "fullTitle": "Homes in Prime Target ZIP Codes, by County",
+            "note": "Shading shows the share of each county’s owner-occupied homes that sit in prime target ZIP codes.",
+            "field": "primeOwnerHomes",
+            "of": "ownerHomes",
+            "color": "prime",
+            "base": "other",
+            "legend": [
+              { "label": "No prime target ZIPs", "mix": 0, "countZero": true },
+              { "label": "Some homes in prime ZIPs", "mix": 50 },
+              { "label": "Most homes in prime ZIPs", "mix": 100 }
+            ],
+            "legendFoot": "Switch to ZIP codes to see the individual prime target ZIPs."
+          }
+        }
+      }
+    ],
+    "overlays": [],
+    "search": {
+      "label": "Find a ZIP or Town",
+      "placeholder": "21044 or Bowie"
+    }
+  },
+  "detail": {
+    "zip": {
+      "title": "{name} {id}",
+      "sub": "{countyLabel}",
+      "rows": [
+        { "label": "Owner-occupied homes", "text": "{ownerHomes:int}" },
+        { "label": "Owner-occupied rate", "text": "{ownerRate:pct}" },
+        { "label": "Share of all homes owner-occupied", "text": "{ownAllShare:pct}" },
+        { "label": "Households", "text": "{households:int}" },
+        { "label": "Median household income", "text": "{income:money}" },
+        { "label": "Median home value", "text": "{homeValue:money}" },
+        { "label": "Owner homes under $400,000", "text": "{bandShare:pct}" }
+      ],
+      "chips": [
+        { "when": { "field": "prime", "eq": 1 }, "text": "Prime target #{primeRank}", "style": "prime" },
+        { "when": { "field": "seasonal", "eq": 1 }, "text": "Seasonal market: {seasonalShare}% of homes" },
+        { "when": { "field": "income", "eq": null }, "text": "Income not published" }
+      ],
+      "note": "note"
+    },
+    "county": {
+      "title": "{label}",
+      "sub": "{region}",
+      "regionSub": true,
+      "rows": [
+        { "label": "Owner-occupied homes", "text": "{ownerHomes:int}" },
+        { "label": "Owner-occupied rate", "text": "{ownerRate:pct}" },
+        { "label": "Share of all homes owner-occupied", "text": "{ownAllShare:pct}" },
+        { "label": "Median household income", "text": "{income:money}" },
+        { "label": "Median home value", "text": "{homeValue:money}" },
+        { "label": "Owner homes under $400,000", "text": "{bandHomes:int} ({bandShare:pct})" },
+        { "label": "Homes in prime ZIPs", "text": "{primeOwnerHomes:int} ({primeZips} ZIPs)" }
+      ]
+    }
+  },
+  "stats": [
+    { "value": "{primeZips}", "highlight": true, "label": "prime target ZIP codes, holding {primeShare:pct1} of Maryland owner-occupied homes" },
+    { "value": "{stateIncome:money}", "label": "Maryland median household income, the bar for the prime target income test" },
+    { "value": "{ownRate}", "unit": "%", "label": "homeownership rate statewide, with {ownerHomes:int} owner-occupied homes" }
+  ],
+  "tiles": [
+    { "value": "{primeZips}", "label": "Prime Target ZIPs" },
+    { "value": "{zips}", "label": "ZIPs Profiled" },
+    { "value": "{ownRate}%", "label": "Homeownership" }
+  ],
+  "images": { "hero": "prime", "card": "income" },
+  "sections": [
+    {
+      "kind": "table",
+      "id": "top-prime",
+      "nav": "Top Prime ZIPs",
+      "title": "Top Prime Target ZIPs",
+      "titleSub": "Ranked by Owner-Occupied Homes.",
+      "intro": "The {limit} largest of the {primeZips} prime target ZIP codes. Each is at least 70% owner-occupied, with median household income of {stateIncome:money} or more. Search the map for the rest.",
+      "view": "zip",
+      "where": { "field": "prime", "eq": 1 },
+      "sort": "primeRank",
+      "limit": 15,
+      "columns": [
+        { "label": "Rank", "text": "#{primeRank}", "style": "rank" },
+        { "label": "ZIP", "text": "{id}", "style": "strong" },
+        { "label": "Town", "text": "{name}" },
+        { "label": "County", "text": "{county}", "style": "soft" },
+        { "label": "Owner-Occupied Homes", "text": "{ownerHomes:int}", "style": "strong", "align": "end" },
+        { "label": "Owner Rate", "text": "{ownerRate:pct}", "align": "end" },
+        { "label": "Median Income", "text": "{income:money}", "align": "end" },
+        { "label": "Median Home Value", "text": "{homeValue:money}", "align": "end" }
+      ]
+    },
+    {
+      "kind": "bars",
+      "id": "regions",
+      "nav": "By Region",
+      "title": "Ownership and Income by Region",
+      "titleSub": "Five Regions.",
+      "intro": "Homeownership rate and household-weighted income for Maryland's five regions. Open a region on the map with ?region=, for example <a href=\"?region=eastern-shore#map\">the Eastern Shore</a>.",
+      "charts": [
+        {
+          "title": "Homeownership Rate",
+          "from": "regionOwnRate",
+          "format": "pct1",
+          "series": [{ "label": "Owner-occupied homes / occupied homes", "color": "bar-a" }],
+          "foot": "Under each region: its owner-occupied homes. Statewide: <b>{ownRate:pct1}</b>."
+        },
+        {
+          "title": "Household Income",
+          "from": "regionIncome",
+          "format": "kmoney",
+          "series": [{ "label": "Household-weighted ZIP median", "color": "bar-a" }],
+          "foot": "Household-weighted average of ZIP code median incomes. Under each region: its households."
+        }
+      ]
+    },
+    {
+      "kind": "table",
+      "id": "county-spread",
+      "nav": "Within Counties",
+      "title": "Income Within Counties",
+      "titleSub": "ZIP by ZIP.",
+      "intro": "Range of ZIP code median household income in the five largest counties by households, ZIP codes with 1,000 or more households. County averages hide this spread; ZIP targeting keeps it.",
+      "view": "county",
+      "where": { "field": "sizeRank", "gt": 0 },
+      "sort": "sizeRank",
+      "limit": 5,
+      "columns": [
+        { "label": "County", "text": "{label}", "style": "strong" },
+        { "label": "Lowest ZIP", "text": "{incLow:money}", "sub": "{incLowZip} {incLowName}", "align": "end" },
+        { "label": "Median ZIP", "text": "{incMed:money}", "align": "end" },
+        { "label": "Highest ZIP", "text": "{incHigh:money}", "sub": "{incHighZip} {incHighName}", "align": "end" },
+        { "label": "ZIPs", "text": "{incZips}", "align": "end" }
+      ]
+    },
+    {
+      "kind": "table",
+      "id": "value-band",
+      "nav": "Homes Under $400K",
+      "title": "Homes Under $400,000",
+      "titleSub": "By County.",
+      "intro": "{bandHomes:int} owner-occupied homes statewide, {bandShare:pct1} of the total, are valued under $400,000 by their owners. The statewide median is {stateHomeValue:money}.",
+      "view": "county",
+      "where": { "field": "bandRank", "gt": 0 },
+      "sort": "bandRank",
+      "limit": 24,
+      "columns": [
+        { "label": "Rank", "text": "#{bandRank}", "style": "rank" },
+        { "label": "County", "text": "{label}", "style": "strong" },
+        { "label": "Region", "text": "{region}", "style": "soft" },
+        { "label": "Owner-Occupied Homes", "text": "{ownerHomes:int}", "align": "end" },
+        { "label": "Under $400,000", "text": "{bandHomes:int}", "style": "strong", "align": "end" },
+        { "label": "Share", "text": "{bandShare:pct}", "align": "end" },
+        { "label": "Median Home Value", "text": "{homeValue:money}", "align": "end" }
+      ]
+    },
+    {
+      "kind": "table",
+      "id": "ownership",
+      "nav": "Two Ownership Measures",
+      "title": "Two Ownership Measures",
+      "titleSub": "Where They Split.",
+      "intro": "The homeownership rate counts only occupied homes. The share of all homes owner-occupied also counts vacant and seasonal homes, so it drops in vacation markets. These are the {limit} ZIP codes with the highest share of homes held for seasonal use.",
+      "view": "zip",
+      "where": { "field": "seasonal", "eq": 1 },
+      "sort": "seasonalRank",
+      "limit": 10,
+      "columns": [
+        { "label": "ZIP", "text": "{id}", "style": "strong" },
+        { "label": "Town", "text": "{name}" },
+        { "label": "County", "text": "{county}", "style": "soft" },
+        { "label": "Seasonal Homes", "text": "{seasonalShare:pct}", "style": "strong", "align": "end" },
+        { "label": "Homeownership Rate", "text": "{ownerRate:pct}", "align": "end" },
+        { "label": "All Homes Owner-Occupied", "text": "{ownAllShare:pct}", "align": "end" },
+        { "label": "Housing Units", "text": "{housingUnits:int}", "align": "end" }
+      ]
+    },
+    {
+      "kind": "facts",
+      "items": [
+        { "eyebrow": "Homeownership rate", "value": "{ownRate:pct1}", "text": "Owner-occupied homes divided by occupied homes, the standard tenure measure and the one the prime target screen uses." },
+        { "eyebrow": "Share of all homes owner-occupied", "value": "{ownAllShare:pct1}", "text": "Owner-occupied homes divided by all housing units, counting vacant, seasonal and rented-out homes." },
+        { "eyebrow": "{seasonalTop.name} {seasonalTop.id}", "value": "{seasonalTop.ownAllShare}%", "text": "of homes are owner-occupied, against a {seasonalTop.ownerRate}% homeownership rate. {seasonalTop.seasonalShare}% are held for seasonal use. {seasonalZips} Maryland ZIP codes are seasonal markets." }
+      ]
+    }
+  ],
+  "regions": [
+    {
+      "id": "baltimore",
+      "label": "Baltimore Metro",
+      "short": "Baltimore",
+      "counties": ["Baltimore City", "Baltimore", "Anne Arundel", "Harford", "Howard", "Carroll"],
+      "stats": [{ "value": "{primeZips} of {zips}", "label": "Baltimore Metro ZIP codes that are prime targets" }]
+    },
+    {
+      "id": "capital",
+      "label": "Capital Region",
+      "short": "Capital",
+      "counties": ["Montgomery", "Prince George's", "Frederick"],
+      "stats": [{ "value": "{primeZips} of {zips}", "label": "Capital Region ZIP codes that are prime targets" }]
+    },
+    {
+      "id": "southern",
+      "label": "Southern Maryland",
+      "short": "Southern",
+      "counties": ["Charles", "Calvert", "St. Mary's"],
+      "stats": [{ "value": "{primeZips} of {zips}", "label": "Southern Maryland ZIP codes that are prime targets" }]
+    },
+    {
+      "id": "western",
+      "label": "Western Maryland",
+      "short": "Western",
+      "counties": ["Allegany", "Garrett", "Washington"],
+      "stats": [{ "value": "{primeZips} of {zips}", "label": "Western Maryland ZIP codes that are prime targets" }]
+    },
+    {
+      "id": "eastern-shore",
+      "label": "Eastern Shore",
+      "short": "Eastern Shore",
+      "counties": ["Cecil", "Kent", "Queen Anne's", "Talbot", "Caroline", "Dorchester", "Wicomico", "Somerset", "Worcester"],
+      "stats": [{ "value": "{primeZips} of {zips}", "label": "Eastern Shore ZIP codes that are prime targets" }]
+    }
+  ],
+  "methods": [
+    { "title": "Prime Targets", "highlight": true, "text": "At least 70% of occupied homes owner-occupied, median household income at or above the Maryland median ({stateIncome:money}), and at least 1,000 owner-occupied homes. Ranked by owner-occupied homes. Home value is shown as its own layer and is not part of the screen." },
+    { "title": "Home Value", "text": "What owners estimate their home would sell for (ACS tables B25075 and B25077). It includes land and is not replacement cost. The Census publishes value in fixed bands, so under $400,000 is exact; a band such as $300,000 to $700,000 is not available and the nearest is $300,000 to $749,999." },
+    { "title": "Two Ownership Measures", "text": "Homeownership rate: owner-occupied homes divided by occupied homes (B25003). Share of all homes owner-occupied: owner-occupied homes divided by all housing units (B25002). Seasonal market: 20% or more of all housing units vacant for seasonal, recreational or occasional use (B25004)." },
+    { "title": "Census Release", "text": "U.S. Census Bureau American Community Survey 2020-2024 5-year estimates, released December 2025. ZIP codes are 2020 Census ZIP Code Tabulation Areas with more than half their land in Maryland; each is placed in the county with the most of its 2020 Census housing units. PO box ZIP codes have no residents and no Census profile." },
+    { "title": "Precision", "text": "Every value carries an ACS margin of error and is most reliable for larger ZIP codes. The Census top-codes income at $250,000 or more and home value at $2,000,000 or more. A blank value means the Census did not publish it, never zero." },
+    { "title": "Regions", "text": "Baltimore Metro, Capital Region, Southern Maryland, Western Maryland and the Eastern Shore, grouped by county. Region income is the household-weighted average of ZIP code medians." }
+  ]
+}

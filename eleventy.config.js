@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { fill, matches } from './src/assets/js/format.js';
+import { fill, formats, matches } from './src/assets/js/format.js';
 
 const SRC = 'src';
 const readJson = file => JSON.parse(fs.readFileSync(file, 'utf8'));
@@ -11,6 +11,8 @@ const MAP_COLORS = {
   'sev-0': '#3b3038', 'sev-1': '#80404a', 'sev-2': '#cc5640', 'sev-3': '#ff8f66',
   'wf-0': '#3a3428', 'wf-1': '#7d5d1f', 'wf-2': '#c98a1c', 'wf-3': '#fbbf24',
   'hail-0': '#1c2a3a', 'hail-1': '#1f5288', 'hail-2': '#2f86d9', 'hail-3': '#8fcbff',
+  'own-0': '#1c2a3a', 'own-1': '#1f5288', 'own-2': '#2f86d9', 'own-3': '#8fcbff',
+  'val-0': '#262b3b', 'val-1': '#3d4c80', 'val-2': '#6178d4', 'val-3': '#b3c2ff',
   t1: '#8fcbff', t2: '#2f86d9', t3: '#1f4670',
   prime: '#057be5', review: '#56637a', other: '#1e2834', nodata: '#12171d',
   edge: '#0d1117', state: '#64748b',
@@ -80,7 +82,7 @@ function tableRows(report, T, attrs) {
     .sort((a, b) => (a[T.sort] ?? Infinity) - (b[T.sort] ?? Infinity))
     .slice(0, T.limit)
     .map(u => T.columns.map(c => {
-      if (!c.layer) return { text: fill(c.text, u) };
+      if (!c.layer) return { text: fill(c.text, u), ...(c.sub && { sub: fill(c.sub, u) }) };
       const L = M.layers.find(l => l.id === c.layer);
       const t = u[L.tier];
       return t == null || t < 0 ? { text: 'No data' }
@@ -89,16 +91,19 @@ function tableRows(report, T, attrs) {
 }
 
 // The sections shown after the map, in order: tables, bar charts, fact cards and notes. A report
-// with only `table` gets that one table. Tables get their rows; bar charts get bar heights.
-function sections(report, attrs) {
+// with only `table` gets that one table. Tables get their rows; bar charts get bar heights. A chart
+// with `from` takes its groups from the edition's meta.json (`charts`), and `format` names a value format.
+function sections(report, attrs, meta) {
   const list = report.sections || (report.table ? [{ kind: 'table', ...report.table }] : []);
   return list.map(s => {
     if (s.kind === 'table') return { ...s, rows: tableRows(report, s, attrs) };
     if (s.kind === 'bars') {
       return { ...s, charts: s.charts.map(c => {
-        const max = Math.max(...c.groups.flatMap(g => g.values));
-        return { ...c, groups: c.groups.map(g => ({ ...g, bars: g.values.map((v, i) => ({
-          value: v.toLocaleString('en-US'), pct: +(v / max * 100).toFixed(1),
+        const groups = c.from ? meta.charts[c.from] : c.groups;
+        const show = c.format ? formats[c.format] : v => v.toLocaleString('en-US');
+        const max = Math.max(...groups.flatMap(g => g.values));
+        return { ...c, groups: groups.map(g => ({ ...g, bars: g.values.map((v, i) => ({
+          value: show(v), pct: +(v / max * 100).toFixed(1),
           color: c.series[g.series ?? i].color })) })) };
       }) };
     }
@@ -126,7 +131,7 @@ function reportPages() {
     // Static map images, one per layer, in the first view.
     const view = report.map.views[0].id;
     const images = Object.fromEntries(report.map.layers.map(l => [l.id, `${url}map-${l.id}.svg`]));
-    return { report, edition: report.edition, meta, url, images, view, sections: sections(report, attrs) };
+    return { report, edition: report.edition, meta, url, images, view, sections: sections(report, attrs, meta) };
   });
   return cache;
 }

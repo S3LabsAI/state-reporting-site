@@ -103,7 +103,7 @@
   <section class="section" id="{{ S.id }}" aria-labelledby="{{ S.id }}-title">
     <div class="sec-head">
       <h2 class="section-title" id="{{ S.id }}-title">{{ S.title }}<br><span class="muted">{{ S.titleSub }}</span></h2>
-      <p>{{ S.intro | fill(meta.stats | merge({ limit: S.rows.length })) }}</p>
+      <p>{{ S.intro | fill(meta.stats | merge({ limit: S.rows.length })) | safe }}</p>
     </div>
     <div class="table-box">
       <table class="dtable">
@@ -114,7 +114,7 @@
           {%- for row in S.rows %}
           <tr>
             {%- for cell in row %}{% set c = S.columns[loop.index0] %}
-            <td class="{{ c.style or '' }}{% if c.align == 'end' %} end{% endif %}">{% if cell.swatch %}<span class="tiersq" style="background:{{ cell.swatch }}"></span>{% endif %}{{ cell.text }}</td>
+            <td class="{{ c.style or '' }}{% if c.align == 'end' %} end{% endif %}">{% if cell.swatch %}<span class="tiersq" style="background:{{ cell.swatch }}"></span>{% endif %}{{ cell.text }}{% if cell.sub %}<span class="sub">{{ cell.sub }}</span>{% endif %}</td>
             {%- endfor %}
           </tr>
           {%- endfor %}
@@ -126,7 +126,7 @@
   <section class="section" id="{{ S.id }}" aria-labelledby="{{ S.id }}-title">
     <div class="sec-head">
       <h2 class="section-title" id="{{ S.id }}-title">{{ S.title }}<br><span class="muted">{{ S.titleSub }}</span></h2>
-      {%- if S.intro %}<p>{{ S.intro | fill(meta.stats) }}</p>{% endif %}
+      {%- if S.intro %}<p>{{ S.intro | fill(meta.stats) | safe }}</p>{% endif %}
     </div>
     <div class="charts">
       {%- for c in S.charts %}
@@ -145,7 +145,7 @@
           </div>
           {%- endfor %}
         </div>
-        {%- if c.foot %}<p class="chart-foot">{{ c.foot }}</p>{% endif %}
+        {%- if c.foot %}<p class="chart-foot">{{ c.foot | fill(meta.stats) | safe }}</p>{% endif %}
       </figure>
       {%- endfor %}
     </div>
@@ -153,7 +153,7 @@
   {%- elif S.kind == "facts" %}
   <div class="facts"{% if S.id %} id="{{ S.id }}"{% endif %}>
     {%- for f in S.items %}
-    <div class="fact"><p class="fact-eb">{{ f.eyebrow }}</p><p class="fact-v">{{ f.value }}</p><p>{{ f.text }}</p></div>
+    <div class="fact"><p class="fact-eb">{{ f.eyebrow | fill(meta.stats) }}</p><p class="fact-v">{{ f.value | fill(meta.stats) }}</p><p>{{ f.text | fill(meta.stats) | safe }}</p></div>
     {%- endfor %}
   </div>
   {%- elif S.kind == "notes" %}
@@ -177,7 +177,7 @@
     </div>
     <div class="methods">
       {%- for m in report.methods %}
-      <div class="method{% if m.highlight %} is-highlight{% endif %}"><h3>{{ m.title }}</h3><p>{{ m.text }}</p></div>
+      <div class="method{% if m.highlight %} is-highlight{% endif %}"><h3>{{ m.title }}</h3><p>{{ m.text | fill(meta.stats) | safe }}</p></div>
       {%- endfor %}
       <div class="method sources">
         <h3>Data Sources</h3>

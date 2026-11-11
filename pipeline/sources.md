@@ -62,6 +62,40 @@ weighted 0.5 (2021-22), 1.0 (2023-24) and 2.0 (2025-26). Score: hail index × ow
 homes × (1 - 0.5 × share built 2010 or later). Tier 1: top 15% by score with index 2.0+; Tier 2: top 40%
 with index 1.0+.
 
+## Homeowner market brief
+
+`pipeline/homeowner_market.py` builds the brief for any state in `BANDS` from Census tables alone. Run it
+without `--publish` first: it also writes `zips.csv`, the ZIP list `geo.py` needs for the map shapes.
+
+```bash
+.venv/bin/python pipeline/homeowner_market.py --state MD --edition 2026-11
+.venv/bin/python pipeline/geo.py --state MD --zips pipeline/out/md/homeowner-market/2026-11/zips.csv \
+  --places "Baltimore:-76.61,39.29" "Annapolis:-76.49,38.98" "Rockville:-77.15,39.08" "Frederick:-77.41,39.41" \
+  "Cumberland:-78.76,39.65" "Waldorf:-76.94,38.62" "Easton:-76.08,38.77" "Salisbury:-75.60,38.36" \
+  "Hagerstown:-77.72,39.64" "Ocean City:-75.08,38.34"
+.venv/bin/python pipeline/homeowner_market.py --state MD --edition 2026-11 --publish
+```
+
+| Dataset | Release | Used for |
+|---|---|---|
+| ACS 5-year table-based summary files | 2020-2024 | B25002 housing units, B25003 tenure, B25004 seasonal vacancy, B11001 households, B19013 median household income, B25077 median home value, B25075 home value bands (ZCTA, county, state) |
+| 2020 Census tabulation blocks and ZCTA relationship files | 2020 | Which ZIP codes belong to the state, and each ZIP code's county (as in the home risk map) |
+| Gazetteer counties | 2024 | County names |
+| Cartographic boundaries (500k) | 2020 state, county, ZCTA | Map shapes (`geo.py`) |
+| GeoNames U.S. postal codes | current | Town name for each ZIP code |
+
+- **Value band:** set per state in `BANDS` and summed from B25075's fixed bands, so only Census band edges are possible: under $400,000 (columns 2-21) and $300,000 to $749,999 (21-23) are defined. B25075 counts owner-occupied homes, so its total equals B25003's owner count.
+- **Tiers and bands:** owner-occupied rate under 40%, 40-69%, 70-89%, 90%+ of occupied homes (the actual rate, not a rank within the state); income under $60k, $60-85k, $85-110k, $110-150k, $150k+; value band share under 25%, 25-49%, 50-74%, 75%+.
+- **Prime target:** owner-occupied rate 70%+, median household income at or above the state's B19013 median, 1,000+ owner-occupied homes; ranked by owner-occupied homes. Value band is not part of the screen; `meta.json` reports `primeInBand50`, the prime ZIPs with half or more of their homes in the band.
+- **Seasonal market:** 20%+ of housing units vacant for seasonal, recreational or occasional use, in ZIP codes with 100+ housing units.
+- **Regions:** county lists in the report config; region homeownership is owner homes over occupied homes, and region income is the household-weighted average of ZIP code medians.
+- **Top codes:** the Census writes 250,001 for "$250,000 or more" income and 2,000,001 for "$2,000,000 or more" value; the site shows them as $250,000+ and $2,000,000+.
+
+Maryland, November 2026: 477 ZIP codes, 24 counties (Baltimore City included), 122 prime target ZIPs holding
+40.2% of owner-occupied homes. ZIP owner-occupied homes sum to 1,597,383 against 1,597,565 for the state. The 182-home gap comes from ZCTAs
+that cross the state line, which are kept whole or left out by where most of their land is; county figures are
+the Census county values and sum exactly to the state.
+
 ## Method details recovered from the October 2026 edition
 
 These rules reproduce the published Oklahoma data and are written into `home_risk.py`:
