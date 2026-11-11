@@ -14,6 +14,8 @@ belong in this repo.
 | `/ca` | California reports |
 | `/ca/brush-fire-risk` | California Brush Fire Risk by ZIP Code (research brief) |
 | `/ca/demographics` | California Demographics by ZIP Code (research brief) |
+| `/md` | Maryland reports |
+| `/md/homeowner-market` | Maryland Homeowner Market Brief (current edition) |
 
 Report links can open on a layer, view, area or region, for example
 `/ok/home-risk?layer=fire&view=county&county=comanche` or `/ok/home-risk?region=southwest`.
@@ -36,6 +38,10 @@ npm run build    # writes _site/
    For more than one table, use `sections` instead of `table`: an ordered list shown after the map,
    each with a `kind` of `table` (same fields as `table`), `bars` (bar charts from the values in the
    config), `facts` (dated fact cards) or `notes` (titled notes). `il-hail-exposure.json` uses all four.
+   A chart can instead take its groups from the edition's `meta.json` (`"from": "<key in meta.charts>"`)
+   and name a value `format` (`pct1`, `money`, `kmoney`); a table column can add a `sub` line; section
+   intros, chart footers, facts and methods can use `{field}` templates filled from `meta.stats`.
+   `md-homeowner-market.json` uses these, so a new state's brief needs only its config and data.
 2. Add the data in `src/data/<state>/<report>/<edition>/` (`attrs.json`, `meta.json`) and the
    shapes in `src/data/<state>/geo-<vintage>.json` (`pipeline/geo.py` builds these from Census 2020
    boundaries for any state; a state taller than it is wide is letterboxed on cards and in the map).
@@ -81,6 +87,7 @@ uv venv --python 3.12 && uv pip install -r pipeline/requirements.txt
 .venv/bin/python pipeline/usfs.py --state OK
 .venv/bin/python pipeline/home_risk.py --state OK --edition 2026-10
 .venv/bin/python pipeline/hail_exposure.py --state IL --edition 2026-10
+.venv/bin/python pipeline/homeowner_market.py --state MD --edition 2026-11
 ```
 
 `npm run check` compares the site data with the original map it was extracted from (that file is

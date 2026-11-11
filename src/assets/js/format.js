@@ -3,7 +3,10 @@
 
 export const formats = {
   int: n => n == null ? 'No data' : n.toLocaleString('en-US'),
-  money: n => n == null ? 'Not published' : '$' + n.toLocaleString('en-US'),
+  // The Census top-codes medians: 250,001 is "$250,000 or more" (income), 2,000,001 is "$2,000,000 or more" (home value).
+  money: n => n == null ? 'Not published' : n === 250001 || n === 2000001 ? '$' + (n - 1).toLocaleString('en-US') + '+'
+    : '$' + n.toLocaleString('en-US'),
+  kmoney: n => n == null ? 'Not published' : '$' + Math.round(n / 1000) + 'k',
   pct: n => n == null ? 'No data' : n + '%',
   pct1: n => n == null ? 'No data' : n.toFixed(1) + '%',
   higherThan: n => n == null ? 'No data' : 'Higher than ' + n + '%',

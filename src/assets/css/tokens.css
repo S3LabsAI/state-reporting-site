@@ -69,6 +69,9 @@
   --wf-0: #3a3428; --wf-1: #7d5d1f; --wf-2: #c98a1c; --wf-3: #fbbf24;
   /* Map: hail index, below average to 4x (lighter = more hail) */
   --hail-0: #1c2a3a; --hail-1: #1f5288; --hail-2: #2f86d9; --hail-3: #8fcbff;
+  /* Map: owner-occupied rate and value band share, lowest to highest (lighter = higher) */
+  --own-0: #1c2a3a; --own-1: #1f5288; --own-2: #2f86d9; --own-3: #8fcbff;
+  --val-0: #262b3b; --val-1: #3d4c80; --val-2: #6178d4; --val-3: #b3c2ff;
   /* Map: targeting tiers, Tier 1 brightest */
   --t1: #8fcbff; --t2: #2f86d9; --t3: #1f4670;
 

@@ -11,11 +11,35 @@
   "sha256": "b25a176b0e6c339b6f3a2a0d3d8446bf06f5f080b4395993ec9a8313efb1c229",
   "fetched": "2026-10-08"
  },
+ "acs/acsdt5y2024-b25002.dat": {
+  "url": "https://www2.census.gov/programs-surveys/acs/summary_file/2024/table-based-SF/data/5YRData/acsdt5y2024-b25002.dat",
+  "bytes": 23400695,
+  "sha256": "eb98debfe8e8533e9a8e647a8c5dca5dbe11401c4de4e4449b4a2ba7dc75620f",
+  "fetched": "2026-11-11"
+ },
  "acs/acsdt5y2024-b25003.dat": {
   "url": "https://www2.census.gov/programs-surveys/acs/summary_file/2024/table-based-SF/data/5YRData/acsdt5y2024-b25003.dat",
   "bytes": 26901770,
   "sha256": "68e963e1ed60fcf6b0658579cefc6498b7a9eb780b9f3e87fd1b9775c4d4ac6c",
   "fetched": "2026-10-08"
+ },
+ "acs/acsdt5y2024-b25004.dat": {
+  "url": "https://www2.census.gov/programs-surveys/acs/summary_file/2024/table-based-SF/data/5YRData/acsdt5y2024-b25004.dat",
+  "bytes": 35329608,
+  "sha256": "cbc82f087ece808cf269ce8e9eb1c3227c28d82206726339a9a34dda8398ec49",
+  "fetched": "2026-11-11"
+ },
+ "acs/acsdt5y2024-b25075.dat": {
+  "url": "https://www2.census.gov/programs-surveys/acs/summary_file/2024/table-based-SF/data/5YRData/acsdt5y2024-b25075.dat",
+  "bytes": 93571338,
+  "sha256": "ebc81e97a2c9d29c0534e6ff056c376085ac76a1e576b5eaf2222e3d9cb2ec55",
+  "fetched": "2026-11-11"
+ },
+ "acs/acsdt5y2024-b25077.dat": {
+  "url": "https://www2.census.gov/programs-surveys/acs/summary_file/2024/table-based-SF/data/5YRData/acsdt5y2024-b25077.dat",
+  "bytes": 18496426,
+  "sha256": "89eb2153764a2330b23959d8bbc29b3a8f3016f087b990f2a8ea0d5096d9a816",
+  "fetched": "2026-11-11"
  },
  "census/2024_Gaz_counties_national.zip": {
   "url": "https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2024_Gazetteer/2024_Gaz_counties_national.zip",
@@ -27,13 +51,13 @@
   "url": "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_us_county_500k.zip",
   "bytes": 12587934,
   "sha256": "1a45c87a5a0c322514c9d5c9ebcba5eb9df313bd38962f6db56107ba0ccacc6f",
-  "fetched": "2026-10-13"
+  "fetched": "2026-11-11"
  },
  "census/cb_2020_us_state_500k.zip": {
   "url": "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_us_state_500k.zip",
   "bytes": 3548589,
   "sha256": "dcc877984a3e4d59c1ee8d068b6681517c545e0c1827b7e78a7c2c7cbb167da6",
-  "fetched": "2026-10-13"
+  "fetched": "2026-11-11"
  },
  "census/cb_2020_us_zcta520_500k.zip": {
   "url": "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_us_zcta520_500k.zip",
@@ -53,12 +77,25 @@
   "sha256": "3ed41278d637dc249e0323306f68be8a6c234e3090f4de88ef328dee71aeaaaf",
   "fetched": "2026-10-08"
  },
+ "census/tab20_zcta520_tabblock20_st24.txt": {
+  "url": "https://www2.census.gov/geo/docs/maps-data/data/rel2020/zcta520/tab20_zcta520_tabblock20_natl.txt",
+  "bytes": 10782932,
+  "sha256": "ed21a65716d1828a283b8bfe962cfda29e955dbc6d82e867e46a9be35eb60dc2",
+  "fetched": "2026-11-11",
+  "note": "filtered to block GEOIDs starting 24"
+ },
  "census/tab20_zcta520_tabblock20_st40.txt": {
   "url": "https://www2.census.gov/geo/docs/maps-data/data/rel2020/zcta520/tab20_zcta520_tabblock20_natl.txt",
   "bytes": 23639289,
   "sha256": "234d48a87797cc21ec85216ed13142ac06f57832d5b3ed88a0776ad26583ba48",
   "fetched": "2026-10-08",
   "note": "filtered to block GEOIDs starting 40"
+ },
+ "census/tl_2020_24_tabblock20.zip": {
+  "url": "https://www2.census.gov/geo/tiger/TIGER2020/TABBLOCK20/tl_2020_24_tabblock20.zip",
+  "bytes": 109605781,
+  "sha256": "152395105863f058c32dbfd8321e8c0f364be1e4b115d38ccf6940cfce1f4990",
+  "fetched": "2026-11-11"
  },
  "census/tl_2020_40_tabblock20.zip": {
   "url": "https://www2.census.gov/geo/tiger/TIGER2020/TABBLOCK20/tl_2020_40_tabblock20.zip",
